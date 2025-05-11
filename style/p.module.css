@@ -54,7 +54,7 @@
     .imagem {
         display: flex;
         justify-self: center;
-        margin-top: -80%;
+        margin-top: -520px;
 
     }
 
@@ -64,11 +64,11 @@
     }
 
     .footerR {
-        margin-top: 20% !important;
+        margin-top: 200px !important;
     }
 }
 
-@media screen and (max-width: 630px) {
+@media screen and (max-width: 500px) {
     .alinhamento {
         display: block;
     }
@@ -81,12 +81,16 @@
         text-align: center;
     }
 
+    .txtcompra {
+        margin-top: 30rem;
+    }
+
     .imagem {
-        margin-top: -140%;
+        margin-top: -550px;
         width: 90%;
     }
 
     .footerR {
-        margin-top: 40% !important;
+        margin-top: 300px !important;
     }
 }
