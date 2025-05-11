@@ -1,0 +1,67 @@
+.contatos{
+    margin-top: 10%;
+    margin-bottom: 10%;
+    display: block;
+    padding: 20px;
+}
+
+.inputs {
+    width: 100%;
+    height: 45px;
+    background-color: #F9DBBD;
+    border: none;
+    border-bottom: solid;
+    font-size: 14px;
+    justify-self: center;
+    margin-bottom: 20px;
+    border-radius: 5px;
+    outline: none;
+}
+
+.inputs::placeholder {
+    color: #2b061e;
+    font-size: 14px;
+    position: absolute;
+    z-index: 2;
+    transition: 500ms; 
+}
+
+.inputs:hover {
+    background-color: #FCEDDE;
+    transition: 500ms;
+}
+
+.inputs:hover::placeholder {
+    margin-top: -15px;
+    transition: 500ms;
+}
+
+.inputs:focus {
+    background-color: #FCEDDE;
+}
+
+.organization {
+    display: flex;
+    justify-content: flex-end;
+}
+
+.buttons {
+    background-color: #2b061e;
+    margin: 10px;
+    width: 150px;
+    border: none;
+}
+
+.buttons:hover {
+    background-color: #604456;
+}
+
+.buttons:active {
+    background-color: #2b061e !important;
+}
+
+@media screen and (max-width: 630px) {
+    .footerR {
+        margin-top: 30% !important;
+    }
+}

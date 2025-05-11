@@ -1,0 +1,58 @@
+.tela {
+    scroll-snap-type: y mandatory;
+}
+
+.corpo {
+    line-height: unset !important;
+}
+
+.title {
+    padding-left: 10px;
+    padding-right: 10px;
+    margin-top: 35px;
+    text-align: center;
+    font-size: 50px;
+    color: #2b061e;
+    margin-bottom: 10%;
+}
+
+.text {
+    font-size: 16px;
+    text-align: justify;
+    margin-top: 20px;
+}
+
+.title2 {
+    text-align: center;
+    color: #797D81 !important;
+    margin: 0px;
+    font-size: 16px !important;
+}
+
+.list{
+    color: #CAC1C7;
+    font-size: 18px !important; 
+    font-family: var(--caveat) 
+  }
+  
+.list li {
+      margin-bottom: 10px;
+  }
+  
+.list li::marker {
+      color: #40C9A2;
+  }
+
+  @media screen and (max-width: 630px) {
+    .list li {
+        font-size: 14px !important;
+    }
+
+    .title2 {
+        font-size: 12px;
+    }
+
+    .text {
+        font-size: 15px;
+    }
+  }

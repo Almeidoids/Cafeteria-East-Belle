@@ -1,0 +1,131 @@
+.card {
+    background-color: #2b061e;
+    min-width: 20rem;
+    width: 20rem;
+    padding: 05px;
+    justify-items: center;
+    border: solid;
+    border-color: #604456;
+}
+
+.etiqueta {
+    height: 50px;
+    width: 30px;
+    position: relative;
+    top: 0px;
+    left: 450%;
+}
+
+.desconto {
+    position: relative;
+    height: 50px;
+    width: 30px;
+    bottom: 17%;
+    left: 44%;
+}
+
+.txtDesconto {
+    font-size: 18px; 
+    font-weight: bolder;
+    justify-self: center;
+    margin-top: 10px;
+    font-family: var(--caveat);
+}
+
+.images {
+    height: 10rem;
+    width: 100%;
+    object-fit: cover;
+}
+
+.border {
+    border: solid;
+    border-color: #CAC1C7;
+    width: 100%;
+    /* margin-top: -30%; */
+}
+
+.nomeProdutos {
+    color: #CAC1C7;
+    margin-top: 5%;
+}
+
+.original {
+    font-size: 14px;
+    margin-bottom: -10px;
+    text-decoration: line-through;
+}
+
+.preco {
+    font-size: 18px;
+}
+
+.botaoComprar {
+    background-color: #604456 !important;
+    border: solid !important;
+    border-radius: 0px !important;
+    border-color: #CAC1C7;
+}
+
+.botaoComprar:hover { 
+    background-color: #2b061e !important;
+    border-color: #604456 !important;
+    color: #604456 !important;
+}
+
+.botaoComprar:active {
+    background-color: #604456 !important;
+    border-color: #CAC1C7 !important;
+}
+
+@media screen and (max-width: 630px) {
+    .card {
+        min-width: 10rem;
+        width: 10rem;
+        padding: 2.5px;
+    }
+
+    .etiqueta {
+        height: 25px;
+        width: 15px;
+    }
+
+    .desconto {
+        height: 25px;
+        width: 15px;
+        bottom: 15%;
+        left: 45%;
+    }
+
+    .txtDesconto {
+        font-size: 10px;
+        margin-top: 5px;
+    }
+
+    .images {
+        height: 5rem;
+    }
+
+    .nomeProdutos {
+        font-size: 10px;
+    }
+
+    .original {
+        font-size: 10px;
+        margin-bottom: -5px;
+    }
+
+    .preco {
+        font-size: 12px;
+    }
+
+    .botaoComprar {
+        width: 54px;
+        height: 21px;
+        font-size: 0.5rem;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        border-width: 0.5px;
+    }
+}

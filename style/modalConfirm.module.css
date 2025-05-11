@@ -1,0 +1,37 @@
+.header {
+    background-color: #2b061e;
+}
+
+.body, .footer {
+    background-color: #DDDFDF !important;
+}
+
+.textHeader {
+    color: #CaC1C7;
+}
+
+.textBody {
+    color: #2b061e;
+    font-size: 24px;
+}
+
+.btnCancel {
+    background-color: #797D81 !important;
+}
+
+.btnBuy {
+    background-color: #2b061e !important;
+    border: none !important;
+}
+
+.alert {
+    position: fixed !important;
+    top: 80%;
+    width: 90%;
+    left: 5%;
+    right: 5%;
+    justify-content: space-between;
+    height: 60px;
+    background-color: #40C9A2 !important;
+    border: none;
+}

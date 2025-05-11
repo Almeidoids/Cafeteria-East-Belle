@@ -1,0 +1,69 @@
+.fundoBanner {
+    background-color: #2b061e;
+}
+
+
+.banner {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    filter: invert(8%) sepia(18%) saturate(100%) hue-rotate(288deg) brightness(86%) contrast(105%);
+}
+
+/* .menu {
+    display: flex;
+    justify-content: center;
+    background-color: #2b061e;
+    width: 100%;
+} */
+
+.titulos {
+    margin-left: 10px;
+    margin-top: 35px;
+    text-align: center;
+    font-size: 50px;
+    color: #2b061e;
+}
+
+.menuFixed {
+    position: "fixed";
+    top: 0px;
+}
+
+.button {
+    width: 100%;
+    height: 50px;
+    font-size: 12px;
+    padding: 5px;
+    border-width: 0px;
+    background-color: #2b061e;
+    color: #CAC1C7;
+}
+
+/* .Link {
+    text-decoration: none;
+    color: #CAC1C7;
+    width: 100%;
+} */
+
+/* .button:hover {
+    transition-duration: 500ms;
+    background-color: #604456;
+} */
+
+.space {
+    margin-top: 3%;
+}
+
+.receitas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.produtos {
+    background-color: #2b061e;
+    width: 25%;
+    height: 30%;
+}
+

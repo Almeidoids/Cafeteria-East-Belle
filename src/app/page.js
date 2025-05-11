@@ -1,95 +1,160 @@
+"use client"
+
 import Image from "next/image";
-import styles from "./page.module.css";
+import { useRef, useEffect, useState } from "react";
+import { useRouter, usePathname } from "next/navigation";
+import Link from "next/link";
 
-export default function Home() {
+//estilos
+import "bootstrap/dist/css/bootstrap.min.css"
+import styles from "../../style/page.module.css"
+
+//fontes
+import { candal } from "../../public/fonts/fonts";
+
+//Componentes
+import Menu from "../../components/menu";
+import CardIndex from "../../components/cardIndex";
+import Rodape from "../../components/rodape";
+import Receitas from "../../components/receitas";
+
+//Constantes
+import receitas from "../../constants/receitas";
+import produtos from "../../constants/produtos";
+import CardItens from "../../components/cardItens";
+import Carrossel from "../../components/carrossel";
+
+export default function Index() {
+
+  const refMenu = useRef(0);
+  const refImage = useRef(0);
+  const location = usePathname();
+  const [index, setIndex] = useState(0);
+  const selledList = produtos.toSorted((a, b) => b.buyed - a.buyed);
+  const [moreSelled, setMoreSelled] = useState(null);
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          refMenu.current.style.position = "static";
+          refMenu.current.style.top = 0;          
+        }
+      },
+    {root: null, threshold: 0.0}
+    )
+
+    function roll() {
+      const menuRect = refMenu.current.getBoundingClientRect();
+      const isAtTop = menuRect.top <= 0;
+      
+      if (isAtTop) {
+        refMenu.current.style.position = "fixed";
+        refMenu.current.style.top = 0;
+        refMenu.current.style.zIndex = 10;
+      }
+      else {
+        observer.observe(refImage.current);
+      };
+    }
+    
+    window.addEventListener("scroll", roll);
+
+    return () => {
+      window.removeEventListener("scroll", roll)
+
+      observer.disconnect
+    }
+  }, []);
+
+  useEffect(() => {
+    setMoreSelled(selledList.map(item => {
+      if(selledList.indexOf(item) < 12) {
+      return (
+          <CardItens
+            key = {item.key}
+            offer = {item.offer}
+            image = {item.image}
+            title = {item.name}
+            original = {item.originalp}
+            link = {`/produtos/${item.key}`}
+          />
+      )};
+    }))
+  }, []);
+
+  const revenue = receitas.map(item => {
+    return (
+      <CardIndex
+          key = {receitas.indexOf(item)}
+          name = {item.name}
+          image = {item.image}
+          description = {item.description}
+          onClick = {() => changeLink(`/item${receitas.indexOf(item)}`, setIndex)}
+      />
+    );
+  })
+
+  const offers = produtos.map(item => {
+    if(item.key <= 12 && item.offer !== 0) {
+      return (
+          <CardItens
+            key = {item.key}
+            offer = {item.offer}
+            image = {item.image}
+            title = {item.name}
+            original = {item.originalp}
+            link = {`/produtos/${item.key}`}
+          />
+      )
+    };
+  })
+
   return (
-    <div className={styles.page}>
-      <main className={styles.main}>
+    <div style = {candal.style}>
+      <div className = "fundoBanner">
         <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js logo"
-          width={180}
-          height={38}
+          src = "/banner/banner.jpg"
+          alt = "Banner Café"
           priority
+          className = {styles.banner}
+          ref = {refImage}
+          width = {1000}
+          height = {1000}
         />
-        <ol>
-          <li>
-            Get started by editing <code>src/app/page.js</code>.
-          </li>
-          <li>Save and see your changes instantly.</li>
-        </ol>
+      </div>
+      <Menu ref = {refMenu}/>
+      <h1 className = {styles.titulos}>Receitas</h1>
+      <div className = {styles.receitas}>
+        {revenue}
+      </div>
 
-        <div className={styles.ctas}>
-          <a
-            className={styles.primary}
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className={styles.logo}
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={20}
-              height={20}
-            />
-            Deploy now
-          </a>
-          <a
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-            className={styles.secondary}
-          >
-            Read our docs
-          </a>
-        </div>
-      </main>
-      <footer className={styles.footer}>
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/file.svg"
-            alt="File icon"
-            width={16}
-            height={16}
-          />
-          Learn
-        </a>
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/window.svg"
-            alt="Window icon"
-            width={16}
-            height={16}
-          />
-          Examples
-        </a>
-        <a
-          href="https://nextjs.org?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <Image
-            aria-hidden
-            src="/globe.svg"
-            alt="Globe icon"
-            width={16}
-            height={16}
-          />
-          Go to nextjs.org →
-        </a>
-      </footer>
-    </div>
+      {location !== `/` &&
+        <Receitas style = {{display: "block"}} close = {() => changeLink("/")} i = {index} />
+      } 
+
+      <h4 style = {{color: "#2b061e !important"}}>Ofertas: </h4>
+      <Carrossel>
+          {offers}
+      </Carrossel>
+      <h4 style = {{color: "#2b061e !important"}}>Mais Vendidos: </h4>
+      <Carrossel>
+        {moreSelled}
+      </Carrossel>
+      <Rodape />
+    </div>  
   );
+}
+
+export function changeLink(url, setIndex) {
+  const arrayurl = url.slice("");
+  url !== "/" ?
+  setIndex(Number(arrayurl[arrayurl.length -1 ])) : arrayurl;
+
+  if (typeof window === "undefined") {
+    return;
+  }
+  else {
+    window.history.pushState(null, "", url);
+  }
 }

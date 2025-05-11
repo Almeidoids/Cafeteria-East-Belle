@@ -1,0 +1,49 @@
+.restart {
+    background-color: inherit;
+    border: none;
+    margin-left: auto;
+}
+
+.carrinhoCorpo {
+    background-color: #2b061e;
+}
+
+.ul {
+    padding: 0px;
+}
+
+.ul:empty::before {
+    content: "Não há nenhum produto no carrinho";
+    font-size: 12px;
+    justify-content: center;
+    display: flex
+}
+
+.lista {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+}
+
+.btnCancelar {
+    background-color: #D81159;
+    border-radius: 10px;
+    width: 7rem;
+    height: 2.2rem;
+    border: none;
+    margin-right: 2rem;
+}
+
+.btnComprar {
+    background-color: #40C9A2;
+    border-radius: 10px;
+    height: 2.2rem;
+    width: 7rem;
+    border: none;
+}
+
+.checkbox {
+    height: 15px;
+    width: 15px; 
+    accent-color: #40C9A2;
+}

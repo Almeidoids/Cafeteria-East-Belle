@@ -1,36 +1,41 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cafeteria East Belle
 
-## Getting Started
+Este projeto é uma reinterpretação de um trabalho acadêmico desenvolvido na Escola Senai Roberto Simonsen. O objetivo é aprimorar o projeto original, adicionando novas tecnologias e boas práticas de desenvolvimento.  
 
-First, run the development server:
+O projeto original está disponivel [aqui](https://almeidoids.github.io/ProjetoHtml/paginas/cafes.htm).  
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Atualmente apenas o front-end está finalizado, o back-end será implementado futuramente.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tecnologias
 
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
+- [React.js](https://react.dev/)
+- [Next.js](https://nextjs.org/)
+- [Bootstrap](https://getbootstrap.com/)
+- [Bootstrap-icons](https://icons.getbootstrap.com/)
+- [Jest](https://jestjs.io/)
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+O projeto também possui um carrinho de compras, implementado com Context API e localStorage caso o usuario queira salvar seus dados ao sair do site.
 
-## Learn More
+## Páginas disponiveis
 
-To learn more about Next.js, take a look at the following resources:
+- Página Inicial;
+- Todos os Produtos;
+- Mais vendidos;
+- Ofertas;
+- Detalhes do Produto;
+- Sobre;
+- Inspiração;
+- Meio Ambiente;
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## Proximos passos
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+A próxima etapa do projeto é implementar funcionalidades de back-end, incluindo:
 
-## Deploy on Vercel
+- Cadastro e login de fornecedores;
+- Cadastro e gerenciamento de produtos
+- Integração com banco de dados
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Para isso pretende-se utilizar:
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [MongoDB](https://www.mongodb.com/) como banco de dados
+- [express.js](https://expressjs.com/) para criação da API e gerenciamento do servidor.
