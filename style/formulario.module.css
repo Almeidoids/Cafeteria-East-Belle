@@ -1,0 +1,35 @@
+.comprar {
+    display: flex;
+    align-items: center;
+    margin-right: 5%;
+}
+
+.comprar2 {
+    display: none;
+    align-items: center;
+    justify-content: center;
+}
+
+.numProdutos {
+    width: 100px;
+    height: 30px;
+}
+
+.botaoComprar {
+    background-color: #40C9A2 !important;
+    border: none !important;
+}
+
+.botaoComprar:hover {
+    transition: 500ms;
+    background-color: #9FE4D0 !important;
+}
+
+.botaoComprar:active {
+    transition: 100ms;
+    background-color: #40C9A2 !important;
+}
+
+.botaoComprar:disabled {
+    z-index: -1;
+}

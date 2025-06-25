@@ -1,0 +1,58 @@
+html {
+    margin: 0px;
+    padding: 0px;
+}
+
+body {
+    margin: 0px;
+    padding: 0px;
+    background-color: #F9DBBD !important;
+}
+
+p, label{
+    font-size: 18px;
+    color: #CAC1C7;
+    font-family: var(--caveat);
+}
+
+h4 {
+    color: #2b061e;
+    margin-left: 10px;
+    margin-top: 10px;
+}
+
+ol li {
+    font-size: 24px;
+    list-style-type: none;
+    margin-left: 30px;
+}
+
+ol li::before {
+    background-size: contain;
+    background-image: url(/images/icones/mancha.png);
+    content: counter(list-item) " ";
+    color: #CAC1C7;
+    position: absolute;
+    height: 50px;
+    width: 50px;
+    left: 10px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+ul li {
+    font-family: var(--caveat);
+    font-size: 18px;
+    margin-left: 0px;
+    margin-top: 20px;
+    list-style-type: initial;
+}
+
+ul li::marker {
+    color: #2b061e !important;
+}
+
+ul li::before {
+    content: none;
+}

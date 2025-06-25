@@ -1,0 +1,106 @@
+@keyframes bule{
+    from {
+        transform: rotateZ(0deg) rotateY(180deg);
+    }
+    to {
+        transform: rotateZ(-75deg) rotateY(180deg) translate(30px, -20px);
+    }
+}
+
+@keyframes carregamento {
+    from {
+        height: 0%;
+    }
+
+    to {
+        height: 43%;
+    }
+}
+
+@keyframes preenchimento {
+    from {
+        height: 0%;
+        clip-path: inset(100% 0 0 0);
+    }
+    to {
+        height: 100%;
+        clip-path: inset(0 0 0 0);
+    }
+}
+
+.bule {
+    height: 81px;
+    width: 81px;
+    transform: rotateY(180deg); 
+    margin-left: 6.2rem;
+    animation: bule both 500ms 
+}
+
+.bailarina {
+    align-self: center;
+    justify-self: center;
+    height: 30px;
+    width: 30px;
+    bottom: 0px;
+    left: 20%;
+    position: absolute;
+    filter: brightness(100);
+    animation: preenchimento both ease-in 2s 1s;
+}
+
+.geral {
+    height: 100%;
+    width: 100%;
+    size: inherit;
+    padding: 0px;
+    margin: 0px;
+}
+
+.divBule {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.carregamento {
+    position: absolute;
+    height: 0%;
+    width: 8px;
+    background-color: #2b061e;
+    margin-top: 10px;
+    border-top-left-radius: 10px;
+    left: 50%;
+    right: 50%;
+    animation: carregamento both 900ms 350ms;
+}
+
+.circulo {
+    height: 50px;
+    width: 50px;
+    border-radius: 30px;
+    position: absolute;
+    align-content: center;
+    top: 50%;
+    justify-self: center;
+    left: 51%;
+    right: 50%;
+}
+
+.preenchimento {
+    width: 100%;
+    height: 0px;
+    clip-path: inset(100% 0 0 0);
+    position: absolute;
+    bottom: 0px;
+    border-radius: 50%;
+    background-color: #2b061e;
+    animation: preenchimento both ease-in 2s 1s;
+}
+
+.h4 {
+    text-align: center;
+    position: absolute;
+    top: 60%;
+    width: 100%;
+}

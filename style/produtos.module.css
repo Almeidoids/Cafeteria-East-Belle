@@ -1,0 +1,22 @@
+.algn {
+    display: flex;
+    justify-content: center;
+}
+
+.organizacaoProdutos {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    padding-top: 10%;
+}
+
+@media screen and (max-width: 1000px) {
+.organizacaoProdutos {
+    grid-template-columns: repeat(2, 1fr);
+}
+}
+
+@media screen and (max-width: 500px) {
+    .organizacaoProdutos {
+        padding-top: 20%;
+    }
+}

@@ -1,0 +1,985 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Carrossel Componente Carrossel 1`] = `
+{
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <div
+        class="organizacaoCarrossel"
+      >
+        <button
+          class="botaoCarrossel"
+        >
+          &lt;
+        </button>
+        <div
+          class="carrossel"
+          data-testid="testeCarrossel"
+        >
+          <div />
+        </div>
+        <button
+          class="botaoCarrossel"
+        >
+          &gt;
+        </button>
+      </div>
+    </div>
+  </body>,
+  "container": <div>
+    <div
+      class="organizacaoCarrossel"
+    >
+      <button
+        class="botaoCarrossel"
+      >
+        &lt;
+      </button>
+      <div
+        class="carrossel"
+        data-testid="testeCarrossel"
+      >
+        <div />
+      </div>
+      <button
+        class="botaoCarrossel"
+      >
+        &gt;
+      </button>
+    </div>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;
+
+exports[`outros componentes Receitas 1`] = `
+{
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <div
+        class="card corpo"
+      >
+        <div
+          style="display: flex;"
+        >
+          <button
+            aria-label="close"
+            class="btn-close"
+            style="margin-left: auto;"
+            type="button"
+          />
+        </div>
+        <h1
+          style="text-align: center; margin-bottom: 20px;"
+        >
+          Café Etíope
+        </h1>
+        <div
+          style="display: flex;"
+        >
+          <div
+            class="conteudo"
+          >
+            <ol
+              class="listaol"
+            >
+              <div>
+                <li>
+                  Ingredientes
+                </li>
+                <ul
+                  class="ul"
+                  style="font-family: fontFamily;"
+                >
+                  <li>
+                    Grãos de café etiopes frescos
+                  </li>
+                  <li>
+                    Água
+                  </li>
+                  <li>
+                    Moedor de café
+                  </li>
+                  <li>
+                    Filtro de papel ou pano (Dependendo do métodp)
+                  </li>
+                  <li>
+                    Cafeteria de sua preferência
+                  </li>
+                  <li>
+                    Açúcar (opcional)
+                  </li>
+                </ul>
+              </div>
+              <div>
+                <li>
+                  Preparo
+                </li>
+                <ol
+                  class="subol"
+                  style="font-family: fontFamily;"
+                >
+                  <li
+                    class="lists"
+                  >
+                    <b>
+                      Moa os grãos:
+                    </b>
+                     Moa os grãos de café de um moedor, ajustando a moagem de acordo com o método escolhido
+                  </li>
+                  <li
+                    class="lists"
+                  >
+                    <b>
+                      Preparando o café:
+                    </b>
+                  </li>
+                  <ul
+                    class="ul"
+                    style="font-family: fontFamily;"
+                  >
+                    <li>
+                      Usando filtro de papel, coloque-o na cafeteria e enxágue com água quente para remover o sabor do papel e pré-aquecer a cafeteira.
+                    </li>
+                    <li>
+                      Aqueça a água até a temperatura ideal (90-95°C)
+                    </li>
+                    <li>
+                      Coloque o café moido na cafeteira, seguindo as proporções recomendadas para o seu método de preparo.
+                    </li>
+                    <li>
+                      Despeje a água quente sobre o café, garantindo que todos os grãos sejam saturados.
+                    </li>
+                    <li>
+                      Aguarde o tempo de infusão necessário
+                    </li>
+                  </ul>
+                  <li
+                    class="lists"
+                  >
+                    <b>
+                      Sirva o café:
+                    </b>
+                     Sirva o café quente e adicione açúcar se desejar.
+                  </li>
+                </ol>
+              </div>
+              <div
+                style="margin-bottom: 10%;"
+              >
+                <li>
+                  Dicas
+                </li>
+                <ul
+                  class="ul"
+                  style="font-family: fontFamily;"
+                >
+                  <li>
+                    Use grãos de café etíopes de alta qualidade para um sabor autêntico+
+                  </li>
+                  <li>
+                    Experimente diferentes métodos de preparo para descobrir o seu favorito.
+                  </li>
+                  <li>
+                    Beba o café etíope com moderação, pois ele é forte e estimulante.
+                  </li>
+                </ul>
+              </div>
+            </ol>
+          </div>
+          <div
+            class="divImagens"
+          >
+            <div>
+              <img
+                alt="Ingredientes Café Etiope"
+                class="imagens"
+                data-nimg="1"
+                decoding="async"
+                height="400"
+                loading="lazy"
+                src="/_next/image?url=%2Fimages%2Freceitas%2FingredientesEtiope.jpg&w=828&q=75"
+                srcset="/_next/image?url=%2Fimages%2Freceitas%2FingredientesEtiope.jpg&w=640&q=75 1x, /_next/image?url=%2Fimages%2Freceitas%2FingredientesEtiope.jpg&w=828&q=75 2x"
+                style="color: transparent;"
+                width="400"
+              />
+            </div>
+            <div>
+              <img
+                alt="Preparo do Café Etiope"
+                class="imagens"
+                data-nimg="1"
+                decoding="async"
+                height="400"
+                loading="lazy"
+                src="/_next/image?url=%2Fimages%2Freceitas%2FpreparoEtiope.jpg&w=828&q=75"
+                srcset="/_next/image?url=%2Fimages%2Freceitas%2FpreparoEtiope.jpg&w=640&q=75 1x, /_next/image?url=%2Fimages%2Freceitas%2FpreparoEtiope.jpg&w=828&q=75 2x"
+                style="color: transparent;"
+                width="400"
+              />
+            </div>
+            <div>
+              <img
+                alt="Mulher muito sorridente aproveitando de seu cafe"
+                class="imagens"
+                data-nimg="1"
+                decoding="async"
+                height="400"
+                loading="lazy"
+                src="/_next/image?url=%2Fimages%2Freceitas%2FdicasEtiope.jpg&w=828&q=75"
+                srcset="/_next/image?url=%2Fimages%2Freceitas%2FdicasEtiope.jpg&w=640&q=75 1x, /_next/image?url=%2Fimages%2Freceitas%2FdicasEtiope.jpg&w=828&q=75 2x"
+                style="color: transparent;"
+                width="400"
+              />
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </body>,
+  "container": <div>
+    <div
+      class="card corpo"
+    >
+      <div
+        style="display: flex;"
+      >
+        <button
+          aria-label="close"
+          class="btn-close"
+          style="margin-left: auto;"
+          type="button"
+        />
+      </div>
+      <h1
+        style="text-align: center; margin-bottom: 20px;"
+      >
+        Café Etíope
+      </h1>
+      <div
+        style="display: flex;"
+      >
+        <div
+          class="conteudo"
+        >
+          <ol
+            class="listaol"
+          >
+            <div>
+              <li>
+                Ingredientes
+              </li>
+              <ul
+                class="ul"
+                style="font-family: fontFamily;"
+              >
+                <li>
+                  Grãos de café etiopes frescos
+                </li>
+                <li>
+                  Água
+                </li>
+                <li>
+                  Moedor de café
+                </li>
+                <li>
+                  Filtro de papel ou pano (Dependendo do métodp)
+                </li>
+                <li>
+                  Cafeteria de sua preferência
+                </li>
+                <li>
+                  Açúcar (opcional)
+                </li>
+              </ul>
+            </div>
+            <div>
+              <li>
+                Preparo
+              </li>
+              <ol
+                class="subol"
+                style="font-family: fontFamily;"
+              >
+                <li
+                  class="lists"
+                >
+                  <b>
+                    Moa os grãos:
+                  </b>
+                   Moa os grãos de café de um moedor, ajustando a moagem de acordo com o método escolhido
+                </li>
+                <li
+                  class="lists"
+                >
+                  <b>
+                    Preparando o café:
+                  </b>
+                </li>
+                <ul
+                  class="ul"
+                  style="font-family: fontFamily;"
+                >
+                  <li>
+                    Usando filtro de papel, coloque-o na cafeteria e enxágue com água quente para remover o sabor do papel e pré-aquecer a cafeteira.
+                  </li>
+                  <li>
+                    Aqueça a água até a temperatura ideal (90-95°C)
+                  </li>
+                  <li>
+                    Coloque o café moido na cafeteira, seguindo as proporções recomendadas para o seu método de preparo.
+                  </li>
+                  <li>
+                    Despeje a água quente sobre o café, garantindo que todos os grãos sejam saturados.
+                  </li>
+                  <li>
+                    Aguarde o tempo de infusão necessário
+                  </li>
+                </ul>
+                <li
+                  class="lists"
+                >
+                  <b>
+                    Sirva o café:
+                  </b>
+                   Sirva o café quente e adicione açúcar se desejar.
+                </li>
+              </ol>
+            </div>
+            <div
+              style="margin-bottom: 10%;"
+            >
+              <li>
+                Dicas
+              </li>
+              <ul
+                class="ul"
+                style="font-family: fontFamily;"
+              >
+                <li>
+                  Use grãos de café etíopes de alta qualidade para um sabor autêntico+
+                </li>
+                <li>
+                  Experimente diferentes métodos de preparo para descobrir o seu favorito.
+                </li>
+                <li>
+                  Beba o café etíope com moderação, pois ele é forte e estimulante.
+                </li>
+              </ul>
+            </div>
+          </ol>
+        </div>
+        <div
+          class="divImagens"
+        >
+          <div>
+            <img
+              alt="Ingredientes Café Etiope"
+              class="imagens"
+              data-nimg="1"
+              decoding="async"
+              height="400"
+              loading="lazy"
+              src="/_next/image?url=%2Fimages%2Freceitas%2FingredientesEtiope.jpg&w=828&q=75"
+              srcset="/_next/image?url=%2Fimages%2Freceitas%2FingredientesEtiope.jpg&w=640&q=75 1x, /_next/image?url=%2Fimages%2Freceitas%2FingredientesEtiope.jpg&w=828&q=75 2x"
+              style="color: transparent;"
+              width="400"
+            />
+          </div>
+          <div>
+            <img
+              alt="Preparo do Café Etiope"
+              class="imagens"
+              data-nimg="1"
+              decoding="async"
+              height="400"
+              loading="lazy"
+              src="/_next/image?url=%2Fimages%2Freceitas%2FpreparoEtiope.jpg&w=828&q=75"
+              srcset="/_next/image?url=%2Fimages%2Freceitas%2FpreparoEtiope.jpg&w=640&q=75 1x, /_next/image?url=%2Fimages%2Freceitas%2FpreparoEtiope.jpg&w=828&q=75 2x"
+              style="color: transparent;"
+              width="400"
+            />
+          </div>
+          <div>
+            <img
+              alt="Mulher muito sorridente aproveitando de seu cafe"
+              class="imagens"
+              data-nimg="1"
+              decoding="async"
+              height="400"
+              loading="lazy"
+              src="/_next/image?url=%2Fimages%2Freceitas%2FdicasEtiope.jpg&w=828&q=75"
+              srcset="/_next/image?url=%2Fimages%2Freceitas%2FdicasEtiope.jpg&w=640&q=75 1x, /_next/image?url=%2Fimages%2Freceitas%2FdicasEtiope.jpg&w=828&q=75 2x"
+              style="color: transparent;"
+              width="400"
+            />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;
+
+exports[`outros componentes Rodape 1`] = `
+{
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <footer
+        class="footer variable undefined"
+      >
+        <div
+          class="column"
+        >
+          <h4
+            class="h4"
+          >
+            Sobre nós
+          </h4>
+          <a
+            href="/sobre"
+          >
+            <p
+              class="textoFooter"
+            >
+              Nossa Cafeteria
+            </p>
+          </a>
+          <a
+            href="/sobre/inspiracao"
+          >
+            <p
+              class="textoFooter"
+            >
+              Nossa Inspiração
+            </p>
+          </a>
+          <a
+            href="/sobre/meioAmbiente"
+          >
+            <p
+              class="textoFooter"
+            >
+              Meio-Ambiente
+            </p>
+          </a>
+          <a
+            href="/sobre/contato"
+          >
+            <p
+              class="textoFooter"
+            >
+              Contate-nos
+            </p>
+          </a>
+        </div>
+        <div
+          class="column"
+        >
+          <h4
+            class="h4"
+          >
+            Produtos
+          </h4>
+          <p
+            class="textoFooter"
+          >
+            Cadastrar produtos
+          </p>
+          <p
+            class="textoFooter"
+          >
+            Alterar Produtos
+          </p>
+          <p
+            class="textoFooter"
+          >
+            Visualizar Produtos
+          </p>
+        </div>
+        <div
+          class="column"
+        >
+          <h4
+            class="h4"
+          >
+            Usuarios
+          </h4>
+          <p
+            class="textoFooter"
+          >
+            Cadastre-se
+          </p>
+          <p
+            class="textoFooter"
+          >
+            Login
+          </p>
+          <p
+            class="textoFooter"
+          >
+            Carrinho
+          </p>
+        </div>
+      </footer>
+    </div>
+  </body>,
+  "container": <div>
+    <footer
+      class="footer variable undefined"
+    >
+      <div
+        class="column"
+      >
+        <h4
+          class="h4"
+        >
+          Sobre nós
+        </h4>
+        <a
+          href="/sobre"
+        >
+          <p
+            class="textoFooter"
+          >
+            Nossa Cafeteria
+          </p>
+        </a>
+        <a
+          href="/sobre/inspiracao"
+        >
+          <p
+            class="textoFooter"
+          >
+            Nossa Inspiração
+          </p>
+        </a>
+        <a
+          href="/sobre/meioAmbiente"
+        >
+          <p
+            class="textoFooter"
+          >
+            Meio-Ambiente
+          </p>
+        </a>
+        <a
+          href="/sobre/contato"
+        >
+          <p
+            class="textoFooter"
+          >
+            Contate-nos
+          </p>
+        </a>
+      </div>
+      <div
+        class="column"
+      >
+        <h4
+          class="h4"
+        >
+          Produtos
+        </h4>
+        <p
+          class="textoFooter"
+        >
+          Cadastrar produtos
+        </p>
+        <p
+          class="textoFooter"
+        >
+          Alterar Produtos
+        </p>
+        <p
+          class="textoFooter"
+        >
+          Visualizar Produtos
+        </p>
+      </div>
+      <div
+        class="column"
+      >
+        <h4
+          class="h4"
+        >
+          Usuarios
+        </h4>
+        <p
+          class="textoFooter"
+        >
+          Cadastre-se
+        </p>
+        <p
+          class="textoFooter"
+        >
+          Login
+        </p>
+        <p
+          class="textoFooter"
+        >
+          Carrinho
+        </p>
+      </div>
+    </footer>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;
+
+exports[`outros componentes cardItens 1`] = `
+{
+  "asFragment": [Function],
+  "baseElement": <body>
+    <div>
+      <div
+        class="card variable"
+      >
+        <img
+          alt=""
+          class="etiqueta"
+          data-nimg="1"
+          decoding="async"
+          height="5000"
+          loading="lazy"
+          src="/_next/image?url=%2Fimages%2Fetiqueta.png&w=3840&q=75"
+          srcset="/_next/image?url=%2Fimages%2Fetiqueta.png&w=3840&q=75 1x"
+          style="color: transparent;"
+          width="5000"
+        />
+        <div
+          class="desconto"
+        >
+          <p
+            class="txtDesconto"
+          >
+            12
+            %
+          </p>
+        </div>
+        <div
+          class="border"
+          style="margin-top: -36%;"
+        >
+          <img
+            alt="nome"
+            class="images"
+            data-nimg="1"
+            decoding="async"
+            height="350"
+            loading="lazy"
+            src="/_next/image?url=%2Fimages%2Faffogato.png&w=750&q=75"
+            srcset="/_next/image?url=%2Fimages%2Faffogato.png&w=384&q=75 1x, /_next/image?url=%2Fimages%2Faffogato.png&w=750&q=75 2x"
+            style="color: transparent;"
+            width="350"
+          />
+        </div>
+        <h5
+          class="nomeProdutos"
+        >
+          nome
+        </h5>
+        <p
+          class="original"
+          style="font-family: fontFamily;"
+        >
+          123
+        </p>
+        <p
+          class="preco"
+          style="font-family: fontFamily;"
+        >
+          108.24
+        </p>
+        <a
+          href="/produtos/0"
+        >
+          <button
+            class="btn btn-primary botaoComprar"
+            type="button"
+          >
+            Comprar
+          </button>
+        </a>
+      </div>
+    </div>
+  </body>,
+  "container": <div>
+    <div
+      class="card variable"
+    >
+      <img
+        alt=""
+        class="etiqueta"
+        data-nimg="1"
+        decoding="async"
+        height="5000"
+        loading="lazy"
+        src="/_next/image?url=%2Fimages%2Fetiqueta.png&w=3840&q=75"
+        srcset="/_next/image?url=%2Fimages%2Fetiqueta.png&w=3840&q=75 1x"
+        style="color: transparent;"
+        width="5000"
+      />
+      <div
+        class="desconto"
+      >
+        <p
+          class="txtDesconto"
+        >
+          12
+          %
+        </p>
+      </div>
+      <div
+        class="border"
+        style="margin-top: -36%;"
+      >
+        <img
+          alt="nome"
+          class="images"
+          data-nimg="1"
+          decoding="async"
+          height="350"
+          loading="lazy"
+          src="/_next/image?url=%2Fimages%2Faffogato.png&w=750&q=75"
+          srcset="/_next/image?url=%2Fimages%2Faffogato.png&w=384&q=75 1x, /_next/image?url=%2Fimages%2Faffogato.png&w=750&q=75 2x"
+          style="color: transparent;"
+          width="350"
+        />
+      </div>
+      <h5
+        class="nomeProdutos"
+      >
+        nome
+      </h5>
+      <p
+        class="original"
+        style="font-family: fontFamily;"
+      >
+        123
+      </p>
+      <p
+        class="preco"
+        style="font-family: fontFamily;"
+      >
+        108.24
+      </p>
+      <a
+        href="/produtos/0"
+      >
+        <button
+          class="btn btn-primary botaoComprar"
+          type="button"
+        >
+          Comprar
+        </button>
+      </a>
+    </div>
+  </div>,
+  "debug": [Function],
+  "findAllByAltText": [Function],
+  "findAllByDisplayValue": [Function],
+  "findAllByLabelText": [Function],
+  "findAllByPlaceholderText": [Function],
+  "findAllByRole": [Function],
+  "findAllByTestId": [Function],
+  "findAllByText": [Function],
+  "findAllByTitle": [Function],
+  "findByAltText": [Function],
+  "findByDisplayValue": [Function],
+  "findByLabelText": [Function],
+  "findByPlaceholderText": [Function],
+  "findByRole": [Function],
+  "findByTestId": [Function],
+  "findByText": [Function],
+  "findByTitle": [Function],
+  "getAllByAltText": [Function],
+  "getAllByDisplayValue": [Function],
+  "getAllByLabelText": [Function],
+  "getAllByPlaceholderText": [Function],
+  "getAllByRole": [Function],
+  "getAllByTestId": [Function],
+  "getAllByText": [Function],
+  "getAllByTitle": [Function],
+  "getByAltText": [Function],
+  "getByDisplayValue": [Function],
+  "getByLabelText": [Function],
+  "getByPlaceholderText": [Function],
+  "getByRole": [Function],
+  "getByTestId": [Function],
+  "getByText": [Function],
+  "getByTitle": [Function],
+  "queryAllByAltText": [Function],
+  "queryAllByDisplayValue": [Function],
+  "queryAllByLabelText": [Function],
+  "queryAllByPlaceholderText": [Function],
+  "queryAllByRole": [Function],
+  "queryAllByTestId": [Function],
+  "queryAllByText": [Function],
+  "queryAllByTitle": [Function],
+  "queryByAltText": [Function],
+  "queryByDisplayValue": [Function],
+  "queryByLabelText": [Function],
+  "queryByPlaceholderText": [Function],
+  "queryByRole": [Function],
+  "queryByTestId": [Function],
+  "queryByText": [Function],
+  "queryByTitle": [Function],
+  "rerender": [Function],
+  "unmount": [Function],
+}
+`;
