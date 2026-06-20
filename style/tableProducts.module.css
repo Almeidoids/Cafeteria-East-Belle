@@ -1,0 +1,135 @@
+.table {
+    background-color: #2b061e;
+    border-radius: 25px;
+    width: 100%;
+}
+
+.tableHead th {
+    text-align: center;
+    border-spacing: 20px;
+    padding-top: 10px;
+}
+
+.title {
+    text-align: start;
+}
+
+.title:first-child {
+    text-align: start;
+}
+
+.addProducts {
+    text-align: end;
+    padding-right: 10px;
+}
+
+.search {
+    border-radius: 5px;
+    width: 60%;
+    margin-left: 5%;
+    background-color: #95838F;
+}
+
+.titletxt {
+    font-size: 24px;
+    color: #F9DBBD;
+    font-family: var(--candal);
+    text-align: center;
+}
+
+.button {
+    background-color: #40C9A2 !important;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    font-family: var(--candal) !important;
+}
+
+.button:hover {
+    background-color: #6c7e79;
+}
+
+.button:active {
+    background-color: #40C9A2 !important;
+}
+
+.buttonAlert {
+    background-color: #D81159 !important;
+    margin: 10px;
+    border: none;
+    border-radius: 5px;
+    font-family: var(--candal) !important;
+}
+
+.buttonAlert:hover {
+    background-color: #E24D83;
+}
+
+.buttonAlert:active {
+    background-color: #D81159 !important;
+}
+
+.buttontd {
+    font-size: 18px;
+    margin: 0px 10px 0 10px;
+}
+
+.icon {
+    color: #2B061e;
+    margin-left: 5px;
+}
+
+.headers {
+    color: #CAC1C7;
+    font-family: var(--candal);
+    /* position: relative;
+    top: 10px; */
+}
+
+.tbody td {
+    color: #CAC1C7;
+    padding: 15px 0 15px 0;
+    text-align: center;
+    font-size: 20px;
+    /* pointer-events: none; */
+}
+
+.tbody:hover {
+    background-color: #604456;
+    transition: 500ms;
+}
+
+/* .tbody:nth-child(even) {
+    background-color: #604456;
+} */
+
+.quantityIsZero {
+    color: #D81159;
+}
+
+.tooltip {
+    --bs-tooltip-bg: #CAC1C7; /* Variavel para cor de fundo */
+    --bs-tooltip-color: #2B061E; /* Variável para cor de texto */
+    --bs-tooltip-max-width: 30rem; /* Variável para width da tooltip */
+    --bs-tooltip-font-size: 20px; /* Variável para tamanho de texto */
+    font-family: var(--caveat);
+}
+
+.inputs {
+    background-color: #95838F;
+    font-family: var(--caveat);
+    min-width: 40px;
+    max-width: 200px;
+    text-align: center;
+
+}
+
+.footer td {
+    text-align: end;
+    padding-right: 10px;
+}
+
+.textBody {
+    color: #2b061e;
+    font-size: 24px;
+}

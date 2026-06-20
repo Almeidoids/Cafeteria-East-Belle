@@ -1,0 +1,31 @@
+.corpo {   
+    width: 70%;
+    position: fixed !important;
+    top: 10%;
+    left: 15%;
+    right: 15%;
+    height: 80% !important;
+    padding: 10px;
+    z-index: 3;
+    overflow: overlay;
+    background-color: #CaC1C7 !important;
+    scroll-behavior: smooth;
+}
+
+.corpo::-webkit-scrollbar {
+    width: 10px;
+}
+
+.corpo::-webkit-scrollbar-thumb {
+    background-color: #2b061e;
+    border-radius: 10px;
+    width: 5px;
+}
+
+@media screen and (max-width: 630px) {
+    .corpo {
+        width: 90%;
+        left: 5%;
+        right: 5%;
+    }
+}

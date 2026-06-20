@@ -1,0 +1,17 @@
+.redirect {
+    height: 80vh;
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    font-family: var(--candal);
+}
+
+.algnItems {
+    display: flex;
+    align-items: center;
+}
+
+.img {
+    margin-right: 20px;
+}

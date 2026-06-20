@@ -1,0 +1,176 @@
+@keyframes screen {
+    from {
+        transform: translateY(-200%);
+    }
+    to {
+        transform: translateY(0px);
+    }
+}
+
+@keyframes text {
+    from {
+        opacity: 0;
+        transform: translateY(10%);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0px);
+    }
+}
+
+@keyframes border {
+    from {
+        transform: translateY(-100%);
+    }
+    to {
+        transform: translateY(0px);
+    }
+}
+
+.tutorial {
+    position: absolute;
+    background-color: #2b061e;
+    min-height: 100%;
+    width: 100%;
+    transform: translateY(-200%);
+    animation: screen 1000ms both;
+}
+
+.algnHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.headerBtn {
+    background-color: inherit;
+    border: none;
+    font-family: var(--candal);
+    color: #F9DBBD;
+    font-size: 20px;
+    margin: 15px;
+}
+
+.textBtn:hover {
+    padding-left: 10px;
+    transition: 0.5s ease;
+}
+
+.dropdownItem {
+    margin: 0;
+    padding: 5px 0 5px 0;
+    font-family: var(--candal);
+    text-align: center;
+    cursor: pointer;
+    color: #2b061e;
+}
+
+.dropdownItem:hover {
+    background-color: #797D81;
+}
+
+.linkEdit {
+    text-decoration: none;
+    width: 100%;
+    height: 100%;
+    color: inherit;
+}
+
+.exitButton:hover {
+    background-color: #D81159;
+}
+
+.iconBtn {
+    font-size: 20px;
+    color: #2b061E;
+    padding-right: 5px;
+}
+
+.algnBody {
+    display: flex;
+    flex-direction: column;
+    padding: 5% 2% 10% 2%;
+}
+
+.border1, .border2, .border3 {
+    position: absolute;
+    border-radius: 2.5rem;
+    width: 2rem;
+    background-color: #2b061e;
+}
+
+.border1 {
+    transform: translateY(-100%);
+    left: 10%;
+    animation: border both 1000ms;
+    height: 10rem;
+}
+
+.border2 {
+    transform: translateY(-100%);
+    left: 60%;    
+    animation: border both 1000ms;
+    height: 8rem;
+}
+
+.border3 {
+    transform: translateY(-100%);
+    right: 10%;
+    animation: border both 1000ms;
+    height: 9rem;
+}
+
+.appear {
+    opacity: 0;
+    transform: translateY(10%);
+    animation: text both 500ms 1000ms;
+}
+
+.disappear {
+    display: none;
+}
+
+.algnProducts {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    opacity: 0;
+    transform: translateY(10%);
+    animation: text both 500ms;
+}
+
+.title {
+    color: #F9DBBD;
+    text-align: center;
+    font-family: var(--candal);
+}
+
+.subtitle {
+    color: #F9DBBD;
+    margin-top: 30px;
+    font-family: var(--candal);
+    font-size: 15px;
+    text-align: center;
+}
+
+.ultutorial {
+    margin-top: 60px;
+    font-size: 16px;
+    color: #F9DBBD;
+}
+
+.algnBtnTutorial {
+    display: flex;
+    margin-top: 10%;
+    justify-content: center;
+}
+
+.btnTutorial {
+    width: 10rem;
+    border: none;
+    background-color: #40C9A2;
+    border-radius: 5px;
+    font-family: var(--candal);
+    color: #2b061e;
+    margin: auto;
+}

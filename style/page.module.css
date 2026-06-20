@@ -1,0 +1,129 @@
+@keyframes aparecer {
+    from {
+        transform: translateY(200px);
+        opacity: 0;
+    }
+    to {
+        transform: translateY(0px);
+        opacity: 1;
+    }
+}
+
+.fundoBanner {
+    background-color: #2b061e;
+}
+
+
+.banner {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    filter: invert(8%) sepia(18%) saturate(100%) hue-rotate(288deg) brightness(86%) contrast(105%);
+}
+
+.titulos {
+    margin-left: 10px;
+    margin-top: 35px;
+    text-align: center;
+    font-size: 50px;
+    color: #2b061e;
+}
+
+.menuFixed {
+    position: "fixed";
+    top: 0px;
+}
+
+.button {
+    width: 100%;
+    height: 50px;
+    font-size: 12px;
+    padding: 5px;
+    border-width: 0px;
+    background-color: #2b061e;
+    color: #CAC1C7;
+}
+
+.space {
+    margin-top: 3%;
+}
+
+.receitas {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.produtos {
+    background-color: #2b061e;
+    width: 25%;
+    height: 30%;
+}
+
+.titleRevenue {
+    text-align: center;
+    margin-bottom: 20px;;
+}
+
+.algnRevenue {
+    display: flex;
+}
+
+.conteudo {
+    padding: 20px;
+}
+
+.listaol {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 1860px;
+}
+
+.subol, .lists {
+    font-size: 20px;
+    list-style-type: counter(list-item);
+    margin-left: 0px;
+    margin-top: 20px;
+}
+
+.lists::marker {
+    content: counter(list-item) ". ";
+    color: #2b061e !important;
+}
+
+.lists::before {
+    content: none;
+}
+
+.alnnFinalRevenue {
+    margin-bottom: 10%;
+}
+
+.divImagens {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 1880px;
+}
+
+.imagens {
+    border-radius: 20px;
+    position: relative;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+    @supports (animation-timeline: scroll()) {
+        .imagens {
+            animation: aparecer linear both 1ms;
+            animation-timeline: view();
+            animation-range: entry;
+        }
+    }
+}
+
+@media screen and (max-width: 1000px) {
+    .divImagens {
+        display: none;
+    }
+}

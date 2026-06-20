@@ -1,0 +1,155 @@
+@keyframes wave {
+    from {
+        opacity: 1;
+        transform: scale(0);
+    }
+    
+    to {
+        opacity: 0;
+        transform: scale(10);
+    } 
+}
+
+@keyframes appear {
+    from {
+        width: 0px;
+        height: 23px;
+    }
+    to {
+        width: 147px;
+        height: 23px;
+    }
+}
+
+.algnFile {
+    position: relative;
+    margin-bottom: 50px;
+    margin-top: 1.5rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.image {
+    height: 275px;
+    width: 275px;
+    border-radius: 10px;
+    border: none;
+    overflow: hidden;
+}
+
+.visualizer {
+    height: 300px;
+    width: 300px;
+}
+
+.changeImg {
+    position: absolute;
+    background-color: #797D81;
+    border-radius: 5px;
+    top: 1%;
+    right: 5px;
+    padding: 1px;
+    padding-inline: 5px;
+    font-family: var(--candal);
+    font-size: 14px;
+    text-wrap-mode: nowrap;
+    color: #F9DBBD;
+    cursor: pointer;
+    overflow-x: hidden;
+    width: 0px;
+    height: 0px;
+}
+
+.changeImgAnimation {
+    animation: appear both 500ms;
+}
+
+.btnAddMI {
+    margin-top: 30px;
+    border: none;
+    border-radius: 5px;
+    font-family: var(--candal) !important;
+    max-width: 300px;
+}
+
+.btnAddMI:hover {
+    transition: 500ms;
+    opacity: 0.7;
+    background-color: #797D81;
+    color: #F9DBBD;
+}
+
+.btnAddMI:active {
+    opacity: 1;
+    background-color: #797D81 !important;
+    color: #F9DBBD !important; 
+}
+
+.modalImage {
+    margin: 30px 5px 30px 5px;
+}
+
+.modalImage:hover {
+    filter: contrast(70%);
+    cursor: pointer;
+}
+
+
+.algnModal {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+}
+
+.imgList {
+    display: flex;
+    align-content: center;
+    flex-wrap: wrap;
+    justify-content: space-around;
+}
+
+.btnImage {
+    margin-top: 1.5rem;
+    margin-bottom: 1.5rem;
+    background-color: #797D81;
+}
+
+.btnImage:hover {
+    background-color: #9B9DA0;
+}
+
+.iconImage {
+    color: #2b061e;
+    font-size: 40px;
+    pointer-events: none;
+}
+
+.txtLenght {
+    text-align: end;
+    font-family: var(--caveat);
+}
+
+.modaltxt {
+    margin-top: auto;
+    text-align: center;
+    color: #2b061e;
+    font-family: var(--candal)
+}
+
+.imageAnimation {
+    transform: scale(0);
+    opacity: 1;
+    border-radius: 50%;
+    position: fixed;
+    color: #797D81;
+    background-color: #F9DBBD;
+    pointer-events: none;
+    animation: wave 1s backwards;
+    left: var(--xClick);
+    top: var(--yClick);
+    height: 10px;
+    width: 10px;
+    overflow: hidden;
+}
