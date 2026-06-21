@@ -35,10 +35,11 @@ export default function TableProducts({ products, setProducts, className, ref })
     const [listEdit, setListEdit] = useState([]);
     const [showButtonSaveAll, setShowButtonSaveAll] = useState(false);
     const router = useRouter();
-    const header = ["Nome", "Preço unidade", "Quantidade", "Compras", "Oferta", "Preço total"];
+    const header = ["Nome", "Quantidade", "Preço unidade", "Oferta", "Preço total", "Compras"];
 
     useEffect(() => {
         setListProducts(products);
+        setListEdit(setListEditDefault(listEdit, products.length));
     }, [products]);
 
     useEffect(() => {
@@ -55,13 +56,13 @@ export default function TableProducts({ products, setProducts, className, ref })
                 break;
             }
         }
-        
+
         setShowButtonSaveAll(showButton);
     }, [listEdit]);
 
     return (
         <div>
-            <table className={`${className} ${styles.table} ${candal.variable} ${caveat.variable}`} ref={ref}>
+            <table className={`${styles.table} ${candal.variable} ${caveat.variable}`} ref={ref}>
                 <thead className={styles.tableHead}>
 
                     <tr className={styles.title}>
@@ -119,16 +120,32 @@ export default function TableProducts({ products, setProducts, className, ref })
 
                 <tfoot className={styles.footer}>
                     <tr>
-                        <td colSpan = {actionsOpen ? 7 : 6}>
+                        <td colSpan={actionsOpen ? 7 : 6}>
                             <div>
-                                <button className={styles.buttonAlert} onClick={() => setShowModalExAll(true)}>Excluir Todos</button>
-                                <button 
-                                    className={styles.button} 
+                                <button
+                                    className={styles.buttonAlert}
+                                    onClick={() => setListEdit(value => {
+                                        value = setListEditDefault(value, listProducts.length)
+                                        return [...value];
+                                    })}
+                                    style={{ display: showButtonSaveAll ? "" : "none" }}
+                                >
+                                    Cancelar Todos
+                                </button>
+                                <button
+                                    className={styles.button}
                                     onClick={() => setShowModalSaveAll(true)}
-                                    style = {{display: showButtonSaveAll ? "" : "none"}}
+                                    style={{ display: showButtonSaveAll ? "" : "none" }}
                                 >
                                     Salvar Todos
                                 </button>
+                                <button 
+                                    className={styles.buttonAlert} 
+                                    onClick={() => setShowModalExAll(true)}
+                                    style={{ display: showButtonSaveAll ? "none" : "" }}
+                                >
+                                        Excluir Todos
+                                    </button>
                             </div>
                         </td>
                     </tr>
@@ -153,14 +170,14 @@ export default function TableProducts({ products, setProducts, className, ref })
 }
 
 function TableRow({ listEdit, setListEdit, setActionsOpen, products, setProducts, item, setAlert, index }, key) {
-    const liRefsOptions = useRef([]);    
+    const liRefsOptions = useRef([]);
     const [idEx, setIdEx] = useState(null);
     const promotion = (item.price * item.offer) / 100;
 
 
-    useEffect(() => {
-        if (!listEdit[index]) listEdit[index] = {};
-    }, []);
+    // useEffect(() => {
+    //     if (!listEdit[index]) listEdit[index] = {};
+    // }, []);
 
     useEffect(() => {
         createRefList(products.length, liRefsOptions.current);
@@ -179,18 +196,49 @@ function TableRow({ listEdit, setListEdit, setActionsOpen, products, setProducts
         >
             {listEdit[index] !== undefined &&
                 <>
-                    {Object.entries(item).filter(([key, _]) => key !== "id" && key !== "_id").map(([key, val]) => {
-                        return <InputData
-                            itemkey={key}
-                            val={val}
-                            item={item}
-                            key={`${item.id}-${key}`}
-                            listEditValue={listEdit[index]}
-                            setListEdit={setListEdit}
-                        />
-                    })}
+                    <InputData
+                        itemkey={"name"}
+                        val={item.name}
+                        item={item}
+                        key={`${item.id}-name`}
+                        listEditValue={listEdit[index]}
+                        setListEdit={setListEdit}
+                    />
+                    <InputData
+                        itemkey={"quantity"}
+                        val={item.quantity}
+                        item={item}
+                        key={`${item.id}-quantity`}
+                        listEditValue={listEdit[index]}
+                        setListEdit={setListEdit}
+                    />
+                    <InputData
+                        itemkey={"price"}
+                        val={item.price}
+                        item={item}
+                        key={`${item.id}-price`}
+                        listEditValue={listEdit[index]}
+                        setListEdit={setListEdit}
+                    />
+                    <InputData
+                        itemkey={"offer"}
+                        val={item.offer}
+                        item={item}
+                        key={`${item.id}-offer`}
+                        listEditValue={listEdit[index]}
+                        setListEdit={setListEdit}
+                    />
 
                     <td>{item.offer === 0 ? item.price : (item.price - promotion).toFixed(2)}</td>
+                    
+                    <InputData
+                        itemkey={"buyed"}
+                        val={item.buyed}
+                        item={item}
+                        key={`${item.id}-buyed`}
+                        listEditValue={listEdit[index]}
+                        setListEdit={setListEdit}
+                    />
 
                     <td
                         ref={e => liRefsOptions.current[key] = e}
@@ -239,7 +287,7 @@ function TableRow({ listEdit, setListEdit, setActionsOpen, products, setProducts
             }
 
             {idEx &&
-                <td colSpan = {0} style = {{textAlign: "left"}}>
+                <td colSpan={0} style={{ textAlign: "left" }}>
                     <ModalConfirm setShowModal={setIdEx} onClick={() => { excludeOne(setAlert, setIdEx, idEx, setProducts) }} >
                         <span className={styles.textBody}>Deseja Excluir este produto?</span>
                     </ModalConfirm>
@@ -386,25 +434,25 @@ async function saveOneItem(item, setAlert, setProducts, setListEdit, index) {
     }
 
     else {
-        const keys = Object.keys(item); 
+        const keys = Object.keys(item);
 
         setAlert("Item atualizado com sucesso!");
 
-        setProducts((value) => {return value.map((val, valIndex) => {
-            if (valIndex === index) {
-                keys.forEach(function (key) {
-                    val[key] = item[key];
-                })
+        setProducts((value) => {
+            return value.map((val, valIndex) => {
+                if (valIndex === index) {
+                    keys.forEach(function (key) {
+                        val[key] = item[key];
+                    })
 
-                return val
-            } 
-            else return val;
-        })});
+                    return val
+                }
+                else return val;
+            })
+        });
 
-        // setListEdit(value => value.filter(edtItem => { edtItem.id !== item.id }));
         setListEdit(value => {
-            console.log(index);
-            value[index] = {_id: id};
+            value[index] = { _id: id };
             console.log(value);
             return [...value]
         })
@@ -429,11 +477,22 @@ async function editAll(setAlert, listEdit, router, setShowModalSaveAll) {
     else {
         setAlert("Dados Salvos com sucesso");
         setShowModalSaveAll(false);
-        
+
         setTimeout(() => {
             if (window !== undefined) {
                 window.location.reload();
             }
         }, 1500)
     }
+}
+
+function setListEditDefault(listEdit, len) {
+    console.log(len);
+    for (let i = 0; i < len; i++) {
+        listEdit[i] = {};
+    }
+
+    console.log(listEdit);
+
+    return listEdit;
 }

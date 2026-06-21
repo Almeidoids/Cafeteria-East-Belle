@@ -24,7 +24,7 @@ import logged from "../../../../util/authentication";
 // Constants
 // import produtos from "../../../../constants/produtos";
 
-export default function Fornecedor({}) {
+export default function Fornecedor({ }) {
     const refBorder1 = useRef(null);
     const refBorder2 = useRef(null);
     const refBorder3 = useRef(null);
@@ -40,11 +40,11 @@ export default function Fornecedor({}) {
             refBorder1.current.remove();
             refBorder2.current.remove();
             refBorder3.current.remove();
+
+            refBorder1.current.removeEventListener("animationend", animation);
         }
 
-        refBorder1.current.addEventListener("animationend", animation())
-
-        return refBorder1.current.removeEventListener("animationend", animation());
+        refBorder1.current.addEventListener("animationend", animation)
     }, []);
 
     useEffect(() => {
@@ -86,21 +86,25 @@ export default function Fornecedor({}) {
 
     return (
         <div className={`${styles.tutorial} ${candal.variable}`}>
-            <div className = {styles.algnHeader}>
-                <Link href = "/" ><BackBtn /></Link>
-                <Dropdown text = "Conta" >
-                    <li className = {`${styles.dropdownItem}`}>
-                        <Link  className = {styles.linkEdit} href = {`/comercial/fornecedor/editarConta`}>Editar conta</Link>
-                    </li>
+            <div className={styles.algnHeader}>
+                <Link href="/" ><BackBtn /></Link>
+                <div style={{ display: "flex" }}>
+                    <button className={styles.headerTxt} onClick={() => disappear(refDisappear.current, refAppear.current)}>?</button>
 
-                    <li className = {`${styles.dropdownItem} ${styles.exitButton} `} onClick = {() => exitSession()} >
-                        <i className = {`bi bi-box-arrow-left ${styles.iconBtn}`} />
-                        Sair da conta
-                    </li>
-                </Dropdown>
+                    <Dropdown text="Conta" >
+                        <li className={`${styles.dropdownItem}`}>
+                            <Link className={styles.linkEdit} href={`/comercial/fornecedor/editarConta`}>Editar conta</Link>
+                        </li>
+
+                        <li className={`${styles.dropdownItem} ${styles.exitButton} `} onClick={() => exitSession()} >
+                            <i className={`bi bi-box-arrow-left ${styles.iconBtn}`} />
+                            Sair da conta
+                        </li>
+                    </Dropdown>
+                </div>
             </div>
 
-            <div className = {styles.algnBody}>
+            <div className={styles.algnBody}>
 
                 {!isLogged &&
                     <Authenticated text={`${reqError}. Redirecionando`} img={"/images/icones/cup.png"} color={"#F9DBBD"} />
@@ -108,7 +112,7 @@ export default function Fornecedor({}) {
 
                 {isLogged &&
                     <div>
-                        <div className={styles.appear} ref={refAppear}>
+                        <div style={{ display: "none" }} ref={refDisappear}>
                             <h1 className={styles.title}>Bem vindo, {supplier}</h1>
                             <h6 className={styles.subtitle}>Nesta página, você verá como pode organizar seus produtos, desde criá-los, até a organizá-los e tirá-los de estoque. Abaixo está uma lista de operações essenciais</h6>
                             <ul className={styles.ultutorial}>
@@ -121,20 +125,23 @@ export default function Fornecedor({}) {
                             </div>
                         </div>
 
-                        <div className={`${styles.disappear}`} ref={refDisappear}>
-
-                            <div style={{ display: products[0] ? "none" : "block" }} >
-                                <h1 className={styles.title}>Comece criando um produto:</h1>
-                                <div className={styles.algnBtnTutorial}>
-                                    <Link href={`/comercial/fornecedor/produto/0`}><button className={styles.btnTutorial} style={{ marginTop: 30 }}>Criar</button></Link>
-                                </div>
-                            </div>
-
-
-                            <div style={{ display: !products[0] ? "none" : "block" }}>
-                                <TableProducts products={products} setProducts={setProducts} />
-                            </div>
-
+                        <div className={styles.appear} ref={refAppear}>
+                            {supplier === null &&
+                                <div className={styles.loading} />
+                            }
+                            {supplier &&
+                                <>
+                                    <div style={{ display: products[0] ? "none" : "block" }} >
+                                        <h1 className={styles.title}>Comece criando um produto:</h1>
+                                        <div className={styles.algnBtnTutorial}>
+                                            <Link href={`/comercial/fornecedor/produto/0`}><button className={styles.btnTutorial} style={{ marginTop: 30 }}>Criar</button></Link>
+                                        </div>
+                                    </div>
+                                    <div style={{ display: !products[0] ? "none" : "block" }}>
+                                        <TableProducts products={products} setProducts={setProducts} />
+                                    </div>
+                                </>
+                            }
                         </div>
 
 
@@ -148,11 +155,16 @@ export default function Fornecedor({}) {
     )
 }
 
-function disappear(appear, disappear) {
-    console.log(disappear);
-    appear.className = styles.disappear;
-    disappear.className = disappear.className.replace(disappear.classList[0], "");
+function disappear(toAppear, toDisappear) {
+    toDisappear.className = styles.disappear;
+
+    setTimeout(() => {
+        toDisappear.style.display = "none";
+        toAppear.style.display = "block";
+        toAppear.className = styles.appear;
+    }, 500)
 }
+
 
 async function exitSession() {
     const res = await fetch("/comercial/exit");
