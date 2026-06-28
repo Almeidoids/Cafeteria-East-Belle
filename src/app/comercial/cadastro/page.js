@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { redirect } from "next/navigation";
+import Link from "next/link";
 
 //Componentes
 import Menu from "../../../../components/menu"
@@ -79,6 +80,9 @@ export default function Cadastro() {
                     <input required className={styles.input} type="text" name="address" />
                     <label className={styles.lbl} htmlFor="password">Senha</label>
                     <input required className={styles.input} type="password" name="password" />
+
+                    <Link href="/comercial/login" className={styles.link}>Já tem uma conta? Faça login</Link>
+
                     <div className={styles.btnalgn}>
                         <input type="reset" className={styles.btnReset} />
                         <button type="submit" className={styles.btnSubmit}>Cadastrar</button>

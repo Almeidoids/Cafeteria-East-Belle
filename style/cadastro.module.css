@@ -23,6 +23,15 @@
     font-family: var(--candal);
 }
 
+.link {
+    color: #F9DBBD;
+    text-decoration: none;
+    font-family: var(--candal);
+    margin-top: 2%;
+    margin-bottom: 5%;
+    font-size: 14px;
+}
+
 .cnpj::-webkit-inner-spin-button {
     appearance: none;
 }
@@ -31,7 +40,8 @@
     display: flex;
     justify-content: space-around;
     width: 70%;
-    margin-top: 10%;
+    margin-top: 5%;
+    margin-bottom: 5%;
 }
 
 .btnReset {
