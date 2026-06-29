@@ -27,9 +27,9 @@ export default function Cadastro() {
         <div className={candal.variable}>
             <Menu style={{ position: "fixed", top: 0 }} />
             {isLogged &&
-                <Authenticated 
-                    text = {"Sua sessão já existe. Redirecionando"} 
-                    color = {"#2B061E"}
+                <Authenticated
+                    text={"Sua sessão já existe. Redirecionando"}
+                    color={"#2B061E"}
                 />
             }
             {!isLogged &&
@@ -45,7 +45,7 @@ export default function Cadastro() {
                     <label className={styles.lbl} htmlFor="password">Senha</label>
                     <input required className={styles.input} type="password" name="password" />
 
-                    <Link href = "/usuario/cadastro" className = {styles.link}>Não tem uma conta? Faça seu cadastro</Link>
+                    <Link href="/usuario/cadastro" className={styles.link}>Não tem uma conta? Faça seu cadastro</Link>
 
                     <div className={styles.btnalgn}>
                         <input type="reset" className={styles.btnReset} />
@@ -65,5 +65,21 @@ async function login(e, setAlert) {
     const data = {
         email: e.target.email.value,
         password: e.target.password.value
+    }
+
+    const res = await fetch("/users/login", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+    });
+
+    if (!res.ok) {
+        const error = await res.json();
+        console.log(error);
+        setAlert(error.error)
+    }
+
+    else {
+        redirect(`/`);
     }
 }

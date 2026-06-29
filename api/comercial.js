@@ -13,11 +13,6 @@ const { Supplier, Products} = require("./models/models");
 
 app.use(express.json());
 
-// app.get("/authenticate", getTkn, (req, res) => {
-//     const user = req.user;
-//     res.json({ user });
-// })
-
 app.post("/cadastro", connect,
 
     async function (req, res, next) {

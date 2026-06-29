@@ -21,20 +21,20 @@ import logged from "../../../../util/authentication";
 
 export default function Cadastro() {
     const refCpf = useRef(null);
-    const [cnpj, setCnpj] = useState(null);
+    const [cpf, setCpf] = useState(null);
     const [alert, setAlert] = useState(null);
     const [isLogged, setIsLogged] = useState(false);
 
     useEffect(() => {
-        const actualCnpj = refCpf.current.value;
-        let updateCnpj = actualCnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
-            function (regex, arg1, arg2, arg3, arg4, arg5) {
-                return arg1 + "." + arg2 + "." + arg3 + "/" + arg4 + "-" + arg5;
+        const actualCpf = refCpf.current.value;
+        let updateCpf = actualCpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,
+            function(regex, arg1, arg2, arg3, arg4, arg5) {
+                return arg1 + "." + arg2 + "." + arg3 + "-" + arg4;
             }
         );
 
-        refCpf.current.value = updateCnpj;
-    }, [cnpj]);
+        refCpf.current.value = updateCpf;
+    }, [cpf]);
 
     return (
         <div className={candal.variable}>
@@ -61,7 +61,7 @@ export default function Cadastro() {
                         pattern="\d{3}\.\d{3}\.\d{3}\-\d{2}"
                         maxLength={14}
                         ref={refCpf}
-                        onChange={(e) => setCnpj(e.currentTarget.value)}
+                        onChange={(e) => setCpf(e.currentTarget.value)}
                     />
                     <label className={styles.lbl} htmlFor="address">Informe seu endereço</label>
                     <input required className={styles.input} type="text" name="address" />
@@ -89,8 +89,26 @@ async function cadastro(e, setAlert) {
     const data = {
         name: e.target.name.value,
         email: e.target.email.value,
-        cnpj: e.target.cnpj.value,
+        cpf: e.target.cpf.value,
         address: e.target.address.value,
         password: e.target.password.value,
+    }
+
+    console.log(data);
+
+    const res = await fetch("/users/cadastro", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+    });
+
+    if (!res.ok) {
+        const error = await res.json();
+        console.log(error);
+        setAlert(error.error)
+    }
+
+    else {
+        redirect("/");
     }
 }
