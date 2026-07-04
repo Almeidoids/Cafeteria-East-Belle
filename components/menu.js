@@ -1,7 +1,7 @@
 "use client"
 
 import Link from "next/link"
-import { useState } from "react";
+import { useState, useEffect } from "react";
 
 //Estilos
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -13,7 +13,26 @@ import { candal } from "../public/fonts/fonts"
 //Componentes
 import Carrinho from "./carrinho";
 
+// Util
+import logged from "../util/authentication";
+
 export default function Menu({ ref, style }) {
+  const [isLogged, setIsLogged] = useState(false);
+  const [user, setUser] = useState("");
+
+  useEffect(() => {
+    async function verifyLogin() {
+      const login = await logged(setIsLogged);
+
+      if ("error" in login) return;
+
+      else setUser(login);
+    }
+
+    verifyLogin();
+
+  }, [])
+
   return (
     <nav className={`${styles.menu} ${candal.variable}`} ref={ref} style={style}>
       <div style={{ display: "flex", width: "100%" }}>
@@ -22,19 +41,14 @@ export default function Menu({ ref, style }) {
         <Link href="/produtos" className={styles.Link}><button className={styles.button}>Todos produtos</button></Link>
         <Link href="/produtos/maisVendidos" className={`${styles.Link} ${styles.desaparecer}`}><button className={styles.button}>Mais vendidos</button></Link>
         <button className={`${styles.button} ${styles.desaparecer}`}>Cadastre-se</button>
-        <div className={`${styles.Link} ${styles.desaparecer} dropdown`}>
-          <button 
-            className={`${styles.button} dropdown-toggle`} 
-            data-bs-toggle="dropdown" 
-            aria-expanded="false"
-          >
-            Login
-          </button>
-          <div className="dropdown-menu" style = {  {backgroundColor: "#2b061e"}}>
-            <Link style = {{color: "#CAC1C7"}} href="/usuario/login"><button className = {styles.button}>Como Usuário</button></Link>
-            <Link style = {{color: "#CAC1C7"}} href="/comercial/login"><button className = {styles.button}>Como Fornecedor</button></Link>
-          </div>
-        </div>
+        
+        {!isLogged &&
+          <ButtonUserNotLogged />
+        }
+        {isLogged &&
+          <ButtonUserLogged user = {user.name} />
+        }
+
         <button
           className={`${styles.buttonCarrinho} ${styles.desaparecer}`}
           data-bs-toggle="offcanvas"
@@ -68,5 +82,44 @@ export default function Menu({ ref, style }) {
         </button>
       </div>
     </nav>
+  )
+}
+
+function ButtonUserNotLogged({ }) {
+  return (
+    <div className={`${styles.Link} ${styles.desaparecer} dropdown`}>
+      <button
+        className={`${styles.button} dropdown-toggle`}
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+      >
+        Login
+      </button>
+      <div className="dropdown-menu" style={{ backgroundColor: "#2b061e" }}>
+        <Link className = {styles.dropdownLinks} href="/usuario/login"><button className={styles.button}>Como Usuário</button></Link>
+        <Link className = {styles.dropdownLinks} href="/comercial/login"><button className={styles.button}>Como Fornecedor</button></Link>
+      </div>
+    </div>
+  )
+}
+
+function ButtonUserLogged({ user }) {
+  return (
+    <div className={`${styles.Link} ${styles.desaparecer} dropdown`}>
+      <button
+        className={`${styles.button} dropdown-toggle`}
+        data-bs-toggle="dropdown"
+        aria-expanded="false"
+        style = {{}}
+      >
+        Minha conta <i className = {`bi bi-person-circle ${styles.icone}`} style = {{marginLeft: 10}} />
+      </button>
+      <div className="dropdown-menu" style={{ backgroundColor: "#2b061e",  width: "100%"}}>
+        <h6 className = {styles.titleUser}>{user}</h6>
+        <Link className = {styles.dropdownLinks} href="/usuario/editarConta"><button className={styles.button}>Editar conta</button></Link>
+        <Link className = {styles.dropdownLinks} href="/comercial/login"><button className={styles.button}>Meus pedidos</button></Link>
+        <button className={styles.button}>Sair da conta</button>
+      </div>
+    </div>
   )
 }

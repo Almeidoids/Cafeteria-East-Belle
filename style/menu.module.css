@@ -31,6 +31,9 @@
     background-color: #2b061e;
     color: #CAC1C7;
     font-family: var(--candal);
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .button:hover, .buttonCarrinho:hover {
@@ -44,6 +47,18 @@
 
 .menuCll {
     display: none;
+}
+
+.titleUser {
+    text-align: center; 
+    color: #CAC1C7; 
+    margin-bottom: 10;
+    font-family: var(--candal);
+}
+
+.dropdownLinks {
+    color: #CAC1C7;
+    text-decoration: none;
 }
 
 @media screen and (max-width: 630px) {

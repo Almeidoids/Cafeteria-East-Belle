@@ -21,8 +21,8 @@ export default function Rodape({style, className}) {
 
             <div className = {styles.column}>
                 <h4 className = {styles.h4}>Usuarios</h4>
-                <p className = {styles.textoFooter}>Cadastre-se</p>
-                <p className = {styles.textoFooter}>Entrar</p>
+                <Link href = "/usuario/cadastro" className = {styles.lnktxt}><p className = {styles.textoFooter}>Cadastre-se</p></Link>
+                <Link href = "/usuario/login" className = {styles.lnktxt}><p className = {styles.textoFooter}>Entrar</p></Link>
             </div>
         </footer>
     )

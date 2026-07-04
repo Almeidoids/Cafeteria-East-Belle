@@ -34,19 +34,16 @@ export default function EditSupplier({ }) {
             const fornecedor = await verifyLogin();
 
             if (fornecedor) {
-                console.log("inicio if");
                 const res = await fetch(`/comercial/fornecedor/${fornecedor}/edit`);
 
                 console.log(fornecedor);
                 setPath(fornecedor);
 
                 if (!res.ok) {
-                    console.log("erro");
                     return;
                 }
 
                 const result = await res.json();
-                console.log(result);
                 const { data } = result;
 
                 setBdData({ data });
