@@ -5,24 +5,25 @@ import { redirect } from "next/navigation";
 import Link from "next/link";
 
 //Componentes
-import Menu from "../../../../components/menu"
-import Rodape from "../../../../components/rodape"
-import Alert from "../../../../components/alert";
-import Authenticated from "../../../../components/authenticated";
+import Menu from "../../../../../components/menu"
+import Rodape from "../../../../../components/rodape"
+import Alert from "../../../../../components/alert";
+import Authenticated from "../../../../../components/authenticated";
 
 //estilos
-import styles from "../../../../style/cadastro.module.css"
+import styles from "../../../../../style/cadastro.module.css"
 
 //Fontes
-import { candal } from "../../../../public/fonts/fonts"
+import { candal } from "../../../../../public/fonts/fonts"
 
 // Util
-import logged from "../../../../util/authentication";
-import editAccount from "../../../../util/account";
+import logged from "../../../../../util/authentication";
+import editAccount from "../../../../../util/account";
 
 export default function EditarConta() {
     const [alert, setAlert] = useState(null);
     const [isLogged, setIsLogged] = useState(false);
+    const [username, setUsername] = useState("");
 
     useEffect(() => {
         async function verifyLogin() {
@@ -34,7 +35,7 @@ export default function EditarConta() {
                 return;
             }
 
-            else return login.name;
+            else setUsername(login.name);
         }
 
         verifyLogin();
@@ -52,7 +53,7 @@ export default function EditarConta() {
             }
 
             {isLogged &&
-                <form className={styles.form} onSubmit={(e) => formPost(e, setAlert)} style = {{width: "40%"}}>
+                <form className={styles.form} onSubmit={(e) => formPost(e, setAlert, username)} style = {{width: "40%"}}>
                     <label className={styles.lbl} htmlFor="pass">Senha</label>
                     <input 
                         required 
@@ -87,7 +88,7 @@ export default function EditarConta() {
     )
 }
 
-async function formPost(e, setAlert) {
+async function formPost(e, setAlert, username) {
     e.preventDefault();
 
     const oldPassword = e.target.pass.value;
@@ -95,9 +96,9 @@ async function formPost(e, setAlert) {
 
     if (newPassword === e.target.reNewPass.value) {
         const data = { oldPassword, newPassword }
+        console.log(username);
 
-
-        const res = await fetch(`/account/client/edit/senha`, {
+        const res = await fetch(`/account/client/${username}/edit/senha`, {
             method: "POST",
             headers: { "Content-Type": "application/json" },
             body: JSON.stringify(data),

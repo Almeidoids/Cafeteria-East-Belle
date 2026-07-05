@@ -145,10 +145,11 @@ app.route("/:type/:username/edit").get(connect, async (req, res) => {
     }
 )
 
-app.post("/:type/:user/edit/senha", connect, async (req, res) => {
+app.post("/:type/:username/edit/senha", connect, async (req, res) => {
     const {oldPassword, newPassword} = req.body;
     const {username, type} = req.params;
     let user = null;
+    console.log(username);
 
     try {
         if (type === "supplier") {

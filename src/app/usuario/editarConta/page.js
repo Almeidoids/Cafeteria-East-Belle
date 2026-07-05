@@ -108,7 +108,9 @@ export default function EditarConta() {
                     />
 
                     <div className={styles.btnalgn}>
-                        <button className={styles.btnSubmit} style = {{backgroundColor: "#797D81", width: "30%"}}>Editar senha</button>
+                        <Link href = "/usuario/editarConta/senha" style = {{width: "30%"}} >
+                            <button className={styles.btnSubmit} style = {{backgroundColor: "#797D81", width: "100%"}}>Editar senha</button>
+                        </Link>
                         <button className={styles.btnReset} style = {{width: "30%"}} onClick= {() => clear(setName, setEmail, setAddress)} >Redefinir</button>
                         <button type="submit" className={styles.btnSubmit} style = {{width: "30%"}}>Atualizar</button>
                     </div>
