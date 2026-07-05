@@ -1,33 +1,6 @@
 const { Client, Supplier } = require("../models/models");
 const bcrypt = require("bcrypt");
 
-async function signUp(req, res, next, type) {
-    let { name, address, password, email, identityDocument } = req.body;
-    req.type = type;
-
-    const cryPassword = await bcrypt.hash(password, 10);
-    const data = {
-        name: name,
-        email: email,
-        address: address,
-        password: cryPassword,
-        [type === "client" ? "cpf" : "cnpj"]: identityDocument
-    }
-
-    const newUser = createUser(type, data);
-
-    try {
-        await newUser.save()
-        next();
-    }
-
-    catch (err) {
-        console.log(`Erro ao cadastrar usuario ${err}`)
-        const { code, message } = identifyError(err);
-        res.status(code).json(message);
-    }
-}
-
 function createUser(type, data) {
     let user;
     if (type === "client") {
@@ -76,22 +49,18 @@ async function login(req, res, next, type) {
     }
 }
 
-async function getUser(identifier, type, res) {
+async function getUser(identifier, type) {
     let user = null;
 
     if (type === "client") {
         user = await Client.findOne({ email: identifier }).exec();
-        console.log("cliente");
-        console.log(user);
     }
 
     if (type === "supplier") {
-        console.log("fornecedor");
         user = await Supplier.findOne({ cnpj: identifier }).exec();
-        console.log(user);
     }
 
     return user;
 }
 
-module.exports = { signUp, login };
+module.exports = { login, createUser, identifyError, getUser };

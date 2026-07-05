@@ -94,11 +94,12 @@ async function login(e, setAlert) {
     e.preventDefault();
 
     const data = {
-        cnpj: e.target.cnpj.value,
-        password: e.target.password.value
+        identifier: e.target.cnpj.value,
+        password: e.target.password.value,
+        type: "supplier"
     }
 
-    const res = await fetch("/comercial/login", {
+    const res = await fetch("/account/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

@@ -105,9 +105,10 @@ async function cadastro(e, setAlert) {
         identityDocument: e.target.cnpj.value,
         address: e.target.address.value,
         password: e.target.password.value,
+        type: "supplier"
     }
 
-    const res = await fetch("/comercial/cadastro", {
+    const res = await fetch("/account/cadastro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

@@ -64,10 +64,11 @@ async function login(e, setAlert) {
 
     const data = {
         identifier: e.target.email.value,
-        password: e.target.password.value
+        password: e.target.password.value,
+        type: "client",
     }
 
-    const res = await fetch("/users/login", {
+    const res = await fetch("/account/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),

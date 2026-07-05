@@ -92,11 +92,12 @@ async function cadastro(e, setAlert) {
         identityDocument: e.target.cpf.value,
         address: e.target.address.value,
         password: e.target.password.value,
+        type: "client"
     }
 
     console.log(data);
 
-    const res = await fetch("/users/cadastro", {
+    const res = await fetch("/account/cadastro", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data)

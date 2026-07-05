@@ -5,47 +5,12 @@ const bcrypt = require("bcrypt");
 // Util
 const connect = require("./util/connect");
 const { setTkn, getTkn } = require("./util/authentication");
-const { signUp, login } = require("./util/loginOrSign");
 
 // Models
 const { Client } = require("./models/models");
 
 
 app.use(express.json());
-
-app.post("/cadastro", connect,
-
-    async function (req, res, next) {
-        signUp(req, res, next, "client");
-    },
-    setTkn);
-
-app.post("/login", connect,
-
-    async function (req, res, next) {
-        login(req, res, next, "client");
-        // const { email, password } = req.body;
-        // req.type = "client";
-        //
-        // try {
-        //     const client = await Client.findOne({ email: email }).exec();
-        //
-        //     if (!client) res.status(404).json({ error: "Usuario não encontrado" });
-        //
-        //     const cryPassword = client.password;
-        //     const uncryPassword = await bcrypt.compare(password, cryPassword);
-        //
-        //     req.body.name = client.name;
-        //
-        //     uncryPassword ? next() :
-        //         res.status(401).json({ error: "Senha incorreta" });
-        // }
-        // catch (err) {
-        //     console.log(err);
-        //     res.status(500).json({ error: "Erro ao logar" });
-        // }
-    },
-    setTkn);
 
 app.route("/:user/edit").get(connect, async (req, res) => {
     const { user } = req.params;

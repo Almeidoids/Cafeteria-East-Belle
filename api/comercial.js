@@ -7,70 +7,11 @@ const upload = multer();
 // UTIL
 const connect = require("./util/connect");
 const { setTkn } = require("./util/authentication");
-const { signUp } = require("./util/loginOrSign");
 
 //Constants
 const { Supplier, Products} = require("./models/models");
 
 app.use(express.json());
-
-app.post("/cadastro", connect,
-
-    async function (req, res, next) {
-        signUp(req, res, next, "supplier");
-        // const { name, email, cnpj, address, password } = req.body;
-        // req.type = "supplier";
-        //
-        // const cryPassword = await bcrypt.hash(password, 10);
-        // const newSupplier = new Supplier({ name: name, email: email, cnpj: cnpj, address: address, password: cryPassword });
-        //
-        // try {
-        //     await newSupplier.save()
-        //     console.log("Usuario salvo");
-        //     next();
-        // }
-        //
-        // catch (err) {
-        //     console.log(`Erro ao cadastrar usuario ${err}`)
-        //
-        //     if (err.code === 11000) {
-        //         res.status(400).json({ error: "Este fornecedor já existe" });
-        //     }
-        //
-        //     else {
-        //         res.status(500).json({ error: "Erro ao cadastrar Fornecedor" });
-        //     }
-        // }
-    },
-
-    setTkn)
-
-app.post("/login", connect,
-
-    async function (req, res, next) {
-        const { cnpj, password } = req.body;
-        req.type = "supplier";
-
-        try {
-            const supplier = await Supplier.findOne({ cnpj: cnpj }).exec();
-
-            if (!supplier) res.status(404).json({ error: "Usuario não encontrado" });
-
-            const cryPassword = supplier.password;
-            const uncryPassword = await bcrypt.compare(password, cryPassword);
-
-            req.body.name = supplier.name;
-
-            uncryPassword ? next() :
-                res.status(401).json({ error: "Senha incorreta" });
-        }
-        catch (err) {
-            console.log(err);
-            res.status(500).json({ error: "Erro ao logar" });
-        }
-
-    },
-    setTkn)
 
 // Requisição Get para pegar informações do Fornecedor.
 app.get("/fornecedor/get/:fornecedor", connect,
@@ -282,24 +223,12 @@ app.route("/fornecedor/produto/edit/:id").get(connect, async (req, res) => {
 
 app.post("/fornecedor/:fornecedor/editAll", connect, async (req, res) => {
     const listEdit = req.body;
-    // console.log(Object.entries(listEdit[0]).map(([key, val]) => ({
-    //         [key === "_id" ? "filter" : "update"] : key === "_id" ? {[key]: val} : {$set: { [key]: val } }
-    //         // [key]: val
-    //     })));
-
-    // const operation = listEdit.map(item => ({
-    //     updateOne: Object.entries(item).map(([key, val]) => ({
-    //         [key === "_id" ? "filter" : "update"] : key === "_id" ? {[key]: val} : {$set: { [key]: val } }
-    //     }))
-    // }));
 
     console.log(listEdit);
 
     const operation = listEdit.map(item => {
-        // { _id: '694248de1ac4478d05c4e151', name: 'Red Eye Café a' }
         const editQuery = {updateOne: {filter: {}, update: {$set: {}}}};
         const result = Object.entries(item).map(([key, val]) => {
-            // id, val
             if (key === "_id") {
                 editQuery.updateOne.filter = {[key] : val};
             }
