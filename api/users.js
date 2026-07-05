@@ -55,14 +55,4 @@ app.route("/:user/edit").get(connect, async (req, res) => {
         }
     })
 
-app.get("/exit", (req, res) => {
-    res.clearCookie("acessToken", { path: "/" });
-    res.clearCookie("refreshToken", { path: "/" });
-
-    console.log(req.headers.cookie);
-
-    res.send("Limpeza concluida");
-})
-
-
 module.exports = app;

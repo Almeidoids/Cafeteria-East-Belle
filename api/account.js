@@ -88,4 +88,11 @@ app.post("/login", connect,
     },
     setTkn);
 
+app.get("/exit", (req, res) => {
+    res.clearCookie("acessToken", {path: "/"});
+    res.clearCookie("refreshToken", {path: "/"});
+
+    res.send("Limpeza concluida");
+})
+
 module.exports = app;

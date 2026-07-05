@@ -167,7 +167,7 @@ function disappear(toAppear, toDisappear) {
 
 
 async function exitSession() {
-    const res = await fetch("/comercial/exit");
+    const res = await fetch("/account/exit");
 
     if (res.ok) {
         redirect("/");

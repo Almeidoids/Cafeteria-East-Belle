@@ -126,7 +126,7 @@ function ButtonUserLogged({ user }) {
 }
 
 async function exitAccount() {
-    const res = await fetch("/users/exit");
+    const res = await fetch("/account/exit");
 
     if (res.ok && window !== undefined) {
         window.location.href = "/";
