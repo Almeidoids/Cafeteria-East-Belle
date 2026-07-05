@@ -15,6 +15,7 @@ import Alert from "../../../../../components/alert";
 
 // UTIL
 import logged from "../../../../../util/authentication";
+import editAccount from "../../../../../util/account";
 
 // Fontes
 import { candal } from "../../../../../public/fonts/fonts";
@@ -34,7 +35,7 @@ export default function EditSupplier({ }) {
             const fornecedor = await verifyLogin();
 
             if (fornecedor) {
-                const res = await fetch(`/comercial/fornecedor/${fornecedor}/edit`);
+                const res = await fetch(`/account/supplier/${fornecedor}/edit`);
 
                 console.log(fornecedor);
                 setPath(fornecedor);
@@ -46,7 +47,7 @@ export default function EditSupplier({ }) {
                 const result = await res.json();
                 const { data } = result;
 
-                setBdData({ data });
+                setBdData({ data, type: "supplier" });
 
                 setName(data.name);
                 setEmail(data.email);
@@ -81,7 +82,7 @@ export default function EditSupplier({ }) {
                 <div>
                     <BackBtn onClick={() => redirect(`/comercial/fornecedor`)} />
 
-                    <form onSubmit={(e) => postForm(e, bdData, setAlert)} className = {styles.editForm}>
+                    <form onSubmit={(e) => editAccount(e, bdData, setAlert)} className = {styles.editForm}>
                         <div className={`${styles.algnInputs} ${styles.algnEdtSupplier}`}>
                             <label className={`${styles.lbl} ${styles.lblEdtSupplier}`} htmlFor="name" >Nome:</label>
                             <input
@@ -155,33 +156,18 @@ function clear(setName, setEmail, setAddress) {
     setAddress([]);
 }
 
-async function postForm(e, bdData, setAlert) {
-    e.preventDefault();
+// async function postForm(e, bdData, setAlert) {
+//     e.preventDefault();
 
-    const items = {
-        name: e.target.name.value,
-        email: e.target.email.value,
-        address: e.target.address.value,
-    }
+//     let [items, data] = setAccountItemsBy(e, bdData);
+//     items = deleteNotEdited(items, data);
+//     const res = await makeEditRequestBy(bdData.type, data.name, items);
 
-    const { data } = bdData;
-
-    Object.entries(data).forEach(function ([key, value]) {
-        if (items[key] === value) delete items[key];
-    })
-
-    const res = await fetch(`/comercial/fornecedor/${data.name}edit`, {
-        method: "POST",
-        headers: { "Content-Type" : "application/json" },
-        body: JSON.stringify(items),
-    });
-
-    if (!res.ok) {
-        const error = await res.json();
-        setAlert(error.error);
-    }
-
-    else {
-        redirect(`/comercial/fornecedor/${"name" in items ? items.name : data.name}`);
-    }
-}
+//     if (!res.ok) {
+//         const error = await res.json();
+//         setAlert(error.error);
+//     }
+//     else {
+//         redirect(`/comercial/fornecedor/${"name" in items ? items.name : data.name}`);
+//     }
+// }

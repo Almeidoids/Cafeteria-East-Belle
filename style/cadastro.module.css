@@ -39,7 +39,7 @@
 .btnalgn {
     display: flex;
     justify-content: space-around;
-    width: 70%;
+    width: 90%;
     margin-top: 5%;
     margin-bottom: 5%;
 }

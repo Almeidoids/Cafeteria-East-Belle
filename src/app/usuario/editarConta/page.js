@@ -18,6 +18,7 @@ import { candal } from "../../../../public/fonts/fonts"
 
 // Util
 import logged from "../../../../util/authentication";
+import editAccount from "../../../../util/account";
 
 export default function EditarConta() {
     const [alert, setAlert] = useState(null);
@@ -32,7 +33,7 @@ export default function EditarConta() {
             const user = await verifyLogin();
 
             if (user) {
-                const res = await fetch(`/users/${user}/edit`);
+                const res = await fetch(`/account/client/${user}/edit`);
 
                 if (!res.ok) {
                     console.log("erro");
@@ -42,7 +43,7 @@ export default function EditarConta() {
                 const result = await res.json();
                 const { data } = result;
 
-                setBdData({ data });
+                setBdData({ data, type: "client" });
 
                 setName(data.name);
                 setEmail(data.email);
@@ -54,7 +55,6 @@ export default function EditarConta() {
             const login = await logged(setIsLogged);
 
             if ("error" in login || login.type !== "client") {
-                console.log(login);
                 setReqError(login.error);
                 setTimeout(() => redirect(`/`), 2000);
                 return;
@@ -78,7 +78,7 @@ export default function EditarConta() {
             }
 
             {isLogged &&
-                <form className={styles.form} onSubmit={(e) => edit(e, setAlert)} style = {{width: "40%"}}>
+                <form className={styles.form} onSubmit={(e) => editAccount(e, bdDate, setAlert)} style = {{width: "40%"}}>
                     <label className={styles.lbl} htmlFor="name">Nome completo</label>
                     <input 
                         required 
@@ -103,13 +103,13 @@ export default function EditarConta() {
                         className={styles.input} 
                         type="text" 
                         name="address" 
-                        value = {name}
-                        onChange = {(e) => setName(e.target.value)}
+                        value = {address}
+                        onChange = {(e) => setAddress(e.target.value)}
                     />
 
                     <div className={styles.btnalgn}>
                         <button className={styles.btnSubmit} style = {{backgroundColor: "#797D81", width: "30%"}}>Editar senha</button>
-                        <input type="reset" className={styles.btnReset} style = {{width: "30%"}} />
+                        <button className={styles.btnReset} style = {{width: "30%"}} onClick= {() => clear(setName, setEmail, setAddress)} >Redefinir</button>
                         <button type="submit" className={styles.btnSubmit} style = {{width: "30%"}}>Atualizar</button>
                     </div>
                 </form>
@@ -121,15 +121,8 @@ export default function EditarConta() {
     )
 }
 
-async function edit(e, setAlert) {
-    e.preventDefault();
-
-    const data = {
-        name: e.target.name.value,
-        email: e.target.email.value,
-        cpf: e.target.cpf.value,
-        address: e.target.address.value,
-        password: e.target.password.value,
-    }
-
+function clear(setName, setEmail, setAddress) {
+    setName("");
+    setEmail("");
+    setAddress([]);
 }

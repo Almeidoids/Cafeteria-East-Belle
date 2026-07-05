@@ -101,48 +101,6 @@ app.route("/fornecedor/produto").post(upload.array("image", 4), connect,
     }
 });
 
-app.route("/fornecedor/:fornecedor/edit").get(connect, async (req, res) => {
-    const { fornecedor } = req.params;
-
-    try {
-        const supplier = await Supplier.findOne({name: fornecedor}).exec();
-
-        if (!supplier) return res.status(404).json({err: "Fornecedor não encontrado!"});
-
-        const data = {
-            id: supplier._id,
-            name: supplier.name,
-            email: supplier.email,
-            address: supplier.address,
-        };
-
-        res.json({data: data});
-    }
-
-    catch (err) {
-        res.status(500).json({ err: "Erro ao capturar os produtos" });
-    }
-})
-.post(connect, async (req, res) => {
-    const items = req.body;
-    const { fornecedor } = req.params;
-
-    if ("name" in items) {
-        setTkn(req, res);
-    }
-
-    try {
-        await Supplier.findOneAndUpdate({name: fornecedor}, {$set: items});
-
-        res.send("Sucesso");
-    }
-    
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ err: "Erro ao atualizar Fornecedor" });
-    }
-})
-
 app.post("/fornecedor/:fornecedor/edit/senha", connect, async (req, res) => {
     const {oldPassword, newPassword} = req.body;
     const {fornecedor} = req.params;
