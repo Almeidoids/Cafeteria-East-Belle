@@ -1,7 +1,8 @@
 const { Client, Supplier } = require("../models/models");
+const bcrypt = require("bcrypt");
 
 async function signUp(req, res, next, type) {
-    let { name, email, address, password, identityDocument } = getReqBody(req.type);
+    let { name, address, password, email, identityDocument } = req.body;
     req.type = type;
 
     const cryPassword = await bcrypt.hash(password, 10);
@@ -13,7 +14,7 @@ async function signUp(req, res, next, type) {
         [type === "client" ? "cpf" : "cnpj"]: identityDocument
     }
 
-    const newUser = getUser(type, data);
+    const newUser = createUser(type, data);
 
     try {
         await newUser.save()
@@ -22,26 +23,12 @@ async function signUp(req, res, next, type) {
 
     catch (err) {
         console.log(`Erro ao cadastrar usuario ${err}`)
-        const {code, message} = identifyError(err);
+        const { code, message } = identifyError(err);
         res.status(code).json(message);
     }
 }
 
-function getReqBody(req, type) {
-    let { name, email, address, password } = req.body;
-    let identityDocument = "";
-
-    if (type === "client") {
-        identityDocument = req.body.cpf;
-    }
-    if (type === "supplier") {
-        identityDocument = req.body.cnpj;
-    }
-
-    return { name, email, address, password, identityDocument };
-}
-
-function getUser(type, data) {
+function createUser(type, data) {
     let user;
     if (type === "client") {
         user = new Client(data);
@@ -55,12 +42,56 @@ function getUser(type, data) {
 
 function identifyError(err) {
     if (err.code === 11000) {
-        return {code: 400, message: "Este usuário já existe"}
+        return { code: 400, message: "Este usuário já existe" }
     }
 
     else {
-        return {code: 500, message: "Erro ao cadastrar usuário"}
+        return { code: 500, message: "Erro ao cadastrar usuário" }
     }
 }
 
-module.exports = {signUp};
+async function login(req, res, next, type) {
+    const { identifier, password } = req.body;
+    req.type = type;
+
+    try {
+        const user = await getUser(identifier, type, res);
+
+        if (!user) {
+            res.status(404).json({ error: "Usuario não encontrado" });
+            return;
+        }
+
+        const cryPassword = user.password;
+        const uncryPassword = await bcrypt.compare(password, cryPassword);
+
+        req.body.name = user.name;
+
+        uncryPassword ? next() :
+            res.status(401).json({ error: "Senha incorreta" });
+    }
+    catch (err) {
+        console.log(err);
+        res.status(500).json({ error: "Erro ao logar" });
+    }
+}
+
+async function getUser(identifier, type, res) {
+    let user = null;
+
+    if (type === "client") {
+        user = await Client.findOne({ email: identifier }).exec();
+        console.log("cliente");
+        console.log(user);
+    }
+
+    if (type === "supplier") {
+        console.log("fornecedor");
+        user = await Supplier.findOne({ cnpj: identifier }).exec();
+        console.log(user);
+    }
+
+    return user;
+}
+
+module.exports = { signUp, login };

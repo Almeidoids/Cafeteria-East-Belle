@@ -1,5 +1,5 @@
 export default async function logged(setIsLogged) {
-    const res = await fetch(`/authenticate`, {
+    const res = await fetch(`/account`, {
         method: "GET",
         headers: { "Content-Type": "application/json" }
     })

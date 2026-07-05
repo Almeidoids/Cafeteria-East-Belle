@@ -5,7 +5,7 @@ const next = require("next");
 const contact = require("./api/contato");
 const merchant = require("./api/comercial");
 const products = require("./api/products");
-const authenticate = require("./api/authenticate");
+const account = require("./api/account");
 const users = require("./api/users");
 
 //Começo do código
@@ -19,7 +19,7 @@ app.prepare().then(() => {
     server.use("/api/launchEmail", contact);
     server.use("/comercial", merchant);
     server.use("/products", products);
-    server.use("/authenticate", authenticate);
+    server.use("/account", account);
     server.use("/users", users);
 
     server.get("/api/myapi", (req, res) => {

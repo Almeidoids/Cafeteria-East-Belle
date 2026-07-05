@@ -63,7 +63,7 @@ async function login(e, setAlert) {
     e.preventDefault();
 
     const data = {
-        email: e.target.email.value,
+        identifier: e.target.email.value,
         password: e.target.password.value
     }
 

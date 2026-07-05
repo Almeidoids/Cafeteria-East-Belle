@@ -102,7 +102,7 @@ async function cadastro(e, setAlert) {
     const data = {
         name: e.target.name.value,
         email: e.target.email.value,
-        cnpj: e.target.cnpj.value,
+        identityDocument: e.target.cnpj.value,
         address: e.target.address.value,
         password: e.target.password.value,
     }

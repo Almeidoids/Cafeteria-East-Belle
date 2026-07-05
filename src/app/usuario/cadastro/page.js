@@ -28,7 +28,7 @@ export default function Cadastro() {
     useEffect(() => {
         const actualCpf = refCpf.current.value;
         let updateCpf = actualCpf.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/,
-            function(regex, arg1, arg2, arg3, arg4, arg5) {
+            function (regex, arg1, arg2, arg3, arg4, arg5) {
                 return arg1 + "." + arg2 + "." + arg3 + "-" + arg4;
             }
         );
@@ -89,7 +89,7 @@ async function cadastro(e, setAlert) {
     const data = {
         name: e.target.name.value,
         email: e.target.email.value,
-        cpf: e.target.cpf.value,
+        identityDocument: e.target.cpf.value,
         address: e.target.address.value,
         password: e.target.password.value,
     }

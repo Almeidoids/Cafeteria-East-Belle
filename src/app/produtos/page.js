@@ -36,7 +36,7 @@ export default function Produtos() {
         }
 
         async function getSupplier(login) {
-            const res = await fetch(`/authenticate/supplier/${login.name}`);
+            const res = await fetch(`/account/supplier/${login.name}`);
 
             if (!res.ok) {
                 const result = await res.json();

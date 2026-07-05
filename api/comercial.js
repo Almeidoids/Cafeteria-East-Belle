@@ -6,7 +6,8 @@ const upload = multer();
 
 // UTIL
 const connect = require("./util/connect");
-const { setTkn, getTkn } = require("./util/authentication");
+const { setTkn } = require("./util/authentication");
+const { signUp } = require("./util/loginOrSign");
 
 //Constants
 const { Supplier, Products} = require("./models/models");
@@ -16,29 +17,30 @@ app.use(express.json());
 app.post("/cadastro", connect,
 
     async function (req, res, next) {
-        const { name, email, cnpj, address, password } = req.body;
-        req.type = "supplier";
-
-        const cryPassword = await bcrypt.hash(password, 10);
-        const newSupplier = new Supplier({ name: name, email: email, cnpj: cnpj, address: address, password: cryPassword });
-
-        try {
-            await newSupplier.save()
-            console.log("Usuario salvo");
-            next();
-        }
-
-        catch (err) {
-            console.log(`Erro ao cadastrar usuario ${err}`)
-
-            if (err.code === 11000) {
-                res.status(400).json({ error: "Este fornecedor já existe" });
-            }
-
-            else {
-                res.status(500).json({ error: "Erro ao cadastrar Fornecedor" });
-            }
-        }
+        signUp(req, res, next, "supplier");
+        // const { name, email, cnpj, address, password } = req.body;
+        // req.type = "supplier";
+        //
+        // const cryPassword = await bcrypt.hash(password, 10);
+        // const newSupplier = new Supplier({ name: name, email: email, cnpj: cnpj, address: address, password: cryPassword });
+        //
+        // try {
+        //     await newSupplier.save()
+        //     console.log("Usuario salvo");
+        //     next();
+        // }
+        //
+        // catch (err) {
+        //     console.log(`Erro ao cadastrar usuario ${err}`)
+        //
+        //     if (err.code === 11000) {
+        //         res.status(400).json({ error: "Este fornecedor já existe" });
+        //     }
+        //
+        //     else {
+        //         res.status(500).json({ error: "Erro ao cadastrar Fornecedor" });
+        //     }
+        // }
     },
 
     setTkn)
