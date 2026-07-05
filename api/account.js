@@ -59,7 +59,8 @@ app.post("/cadastro", connect,
             res.status(code).json(message);
         }
     },
-    setTkn);
+    setTkn
+);
 
 app.post("/login", connect,
     async function (req, res, next) {
@@ -86,7 +87,8 @@ app.post("/login", connect,
             res.status(500).json({ error: "Erro ao logar" });
         }
     },
-    setTkn);
+    setTkn
+);
 
 app.route("/:type/:username/edit").get(connect, async (req, res) => {
     const { username, type } = req.params;
@@ -140,7 +142,45 @@ app.route("/:type/:username/edit").get(connect, async (req, res) => {
             console.log(err);
             res.status(500).json({ err: "Erro ao atualizar usuario" });
         }
-    })
+    }
+)
+
+app.post("/:type/:user/edit/senha", connect, async (req, res) => {
+    const {oldPassword, newPassword} = req.body;
+    const {username, type} = req.params;
+    let user = null;
+
+    try {
+        if (type === "supplier") {
+            user = await Supplier.findOne({name: username}).exec();
+        }
+        if (type === "client") {
+            user = await Client.findOne({name: username}).exec();
+        }
+
+        if (!user) throw new Error();
+
+        const verifyPassword = await bcrypt.compare(oldPassword, user.password);
+
+        if (verifyPassword) {
+            const cryPassword = await bcrypt.hash(newPassword, 10);
+
+            user.password = cryPassword;
+            await user.save();
+
+            res.send("Sucesso");
+        }
+
+        else {
+            res.status(401).json({error: "Uma das senhas é inválida"});
+        }
+    }
+
+    catch (err) {
+        res.status(500).json({error: "Erro ao trocar senha"});
+    }
+})
+
 
 app.get("/exit", (req, res) => {
     res.clearCookie("acessToken", { path: "/" });
