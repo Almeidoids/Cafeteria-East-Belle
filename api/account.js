@@ -7,6 +7,7 @@ const connect = require("./util/connect");
 const { getTkn, setTkn } = require("./util/authentication");
 const { Supplier, Client } = require("./models/models");
 const { createUser, identifyError, getUser } = require("./util/loginOrSign");
+const HTTPErrors = require("./util/HTTPErrors");
 
 app.use(express.json());
 
@@ -21,7 +22,7 @@ app.get("/supplier/:supplier", connect, async (req, res) => {
     try {
         const dbSupplier = await Supplier.findOne({ name: supplier }).exec();
 
-        if (!dbSupplier) throw new Error();
+        if (!dbSupplier) throw new HTTPErrors("Fornecedor não encontrado", 404);
 
         else res.json({ id: dbSupplier._id });
     }
@@ -54,7 +55,6 @@ app.post("/cadastro", connect,
         }
 
         catch (err) {
-            console.log(`Erro ao cadastrar usuario ${err}`)
             const { code, message } = identifyError(err);
             res.status(code).json(message);
         }
@@ -71,8 +71,7 @@ app.post("/login", connect,
             const user = await getUser(identifier, type, res);
 
             if (!user) {
-                res.status(404).json({ error: "Usuario não encontrado" });
-                return;
+                throw new HTTPErrors("Usuario não encontrado", 404);
             }
 
             const cryPassword = user.password;
@@ -80,11 +79,14 @@ app.post("/login", connect,
 
             req.body.name = user.name;
 
-            uncryPassword ? next() :
-                res.status(401).json({ error: "Senha incorreta" });
+            if (!uncryPassword) {
+                throw new HTTPErrors("Senha incorreta", 401);
+            }
+
+            next()
         }
         catch (err) {
-            res.status(500).json({ error: "Erro ao logar" });
+            next(err);
         }
     },
     setTkn
@@ -102,7 +104,7 @@ app.route("/:type/:username/edit").get(connect, async (req, res) => {
             user = await Supplier.findOne({ name: username }).exec();
         }
 
-        if (!user) return res.status(404).json({ err: "Usuário não encontrado!" });
+        if (!user) return throw new HTTPErrors("Usuario não encontrado", 404);
 
         const data = {
             id: user._id,
@@ -139,27 +141,27 @@ app.route("/:type/:username/edit").get(connect, async (req, res) => {
         }
 
         catch (err) {
-            console.log(err);
-            res.status(500).json({ err: "Erro ao atualizar usuario" });
+            next(err);
         }
     }
-)
+    )
 
 app.post("/:type/:username/edit/senha", connect, async (req, res) => {
-    const {oldPassword, newPassword} = req.body;
-    const {username, type} = req.params;
+    const { oldPassword, newPassword } = req.body;
+    console.log(oldPassword);
+    console.log(newPassword);
+    const { username, type } = req.params;
     let user = null;
-    console.log(username);
 
     try {
         if (type === "supplier") {
-            user = await Supplier.findOne({name: username}).exec();
+            user = await Supplier.findOne({ name: username }).exec();
         }
         if (type === "client") {
-            user = await Client.findOne({name: username}).exec();
+            user = await Client.findOne({ name: username }).exec();
         }
 
-        if (!user) throw new Error();
+        if (!user) throw new HTTPErrors("Usuario não encontrado", 404);
 
         const verifyPassword = await bcrypt.compare(oldPassword, user.password);
 
@@ -173,12 +175,12 @@ app.post("/:type/:username/edit/senha", connect, async (req, res) => {
         }
 
         else {
-            res.status(401).json({error: "Uma das senhas é inválida"});
+            throw new HTTPErrors("Senha incorreta", 401);
         }
     }
 
     catch (err) {
-        res.status(500).json({error: "Erro ao trocar senha"});
+        next(err);
     }
 })
 

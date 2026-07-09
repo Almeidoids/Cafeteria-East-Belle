@@ -17,6 +17,7 @@ import { candal } from "../../../../../../public/fonts/fonts";
 
 // functions
 import logged from "../../../../../../util/authentication";
+import { redefinePassword } from "../../../../../../util/account";
 
 export default function EditarSenha({ }) {
     const [isLogged, setIsLogged] = useState(true);
@@ -51,7 +52,7 @@ export default function EditarSenha({ }) {
                 <div>
                     <BackBtn onClick={() => redirect(`/comercial/fornecedor/`)} />
 
-                    <form onSubmit={(e) => formPost(e, setAlert, path)} className = {styles.editForm}>
+                    <form onSubmit={(e) => redefinePassword(e, setAlert, { name: path, type: "supplier" })} className={styles.editForm}>
                         <div className={`${styles.algnInputs} ${styles.algnEdtSupplier}`}>
                             <label className={`${styles.lbl} ${styles.lblEdtSupplier}`} htmlFor="password" >Senha:</label>
                             <input
@@ -100,38 +101,4 @@ export default function EditarSenha({ }) {
 
         </div>
     )
-}
-
-async function formPost(e, setAlert, path) {
-    e.preventDefault();
-
-    const oldPassword = e.target.pass.value;
-    const newPassword = e.target.newPassword.value;
-
-    if (newPassword === e.target.repeatPassword.value) {
-        const data = { oldPassword, newPassword }
-
-
-        const res = await fetch(`/comercial/fornecedor/edit/senha`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        })
-
-        if (!res.ok) {
-            const result = await res.json();
-            console.log(result);
-
-            setAlert(result.error);
-        }
-
-        else {
-            console.log("a");
-            redirect(`/comercial/fornecedor`);
-        }
-    }
-
-    else {
-        setAlert("Uma das senhas é inválida");
-    }
 }

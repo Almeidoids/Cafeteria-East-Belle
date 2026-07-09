@@ -18,7 +18,7 @@ import { candal } from "../../../../../public/fonts/fonts"
 
 // Util
 import logged from "../../../../../util/authentication";
-import editAccount from "../../../../../util/account";
+import editAccount, { redefinePassword } from "../../../../../util/account";
 
 export default function EditarConta() {
     const [alert, setAlert] = useState(null);
@@ -53,31 +53,35 @@ export default function EditarConta() {
             }
 
             {isLogged &&
-                <form className={styles.form} onSubmit={(e) => formPost(e, setAlert, username)} style = {{width: "40%"}}>
+                <form
+                    className={styles.form}
+                    onSubmit={(e) => redefinePassword(e, setAlert, { name: username, type: "client" })}
+                    style={{ width: "40%" }}
+                >
                     <label className={styles.lbl} htmlFor="pass">Senha</label>
-                    <input 
-                        required 
-                        className={styles.input} 
-                        type="password" 
+                    <input
+                        required
+                        className={styles.input}
+                        type="password"
                         name="pass"
                     />
                     <label className={styles.lbl} htmlFor="newPass">Nova senha</label>
-                    <input 
-                        required 
-                        className={styles.input} 
-                        type="password" 
-                        name="newPass" 
+                    <input
+                        required
+                        className={styles.input}
+                        type="password"
+                        name="newPassword"
                     />
                     <label className={styles.lbl} htmlFor="reNewPass">Redigite a nova senha</label>
-                    <input 
-                        required 
-                        className={styles.input} 
-                        type="password" 
-                        name="reNewPass" 
+                    <input
+                        required
+                        className={styles.input}
+                        type="password"
+                        name="repeatPassword"
                     />
 
                     <div className={styles.btnalgn}>
-                        <button type="submit" className={styles.btnSubmit} style = {{width: "30%"}}>Redefinir</button>
+                        <button type="submit" className={styles.btnSubmit} style={{ width: "30%" }}>Redefinir</button>
                     </div>
                 </form>
             }
@@ -86,37 +90,4 @@ export default function EditarConta() {
             <Rodape />
         </div>
     )
-}
-
-async function formPost(e, setAlert, username) {
-    e.preventDefault();
-
-    const oldPassword = e.target.pass.value;
-    const newPassword = e.target.newPass.value;
-
-    if (newPassword === e.target.reNewPass.value) {
-        const data = { oldPassword, newPassword }
-        console.log(username);
-
-        const res = await fetch(`/account/client/${username}/edit/senha`, {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify(data),
-        })
-
-        if (!res.ok) {
-            const result = await res.json();
-            console.log(result);
-
-            setAlert(result.error);
-        }
-
-        else {
-            redirect(`/`);
-        }
-    }
-
-    else {
-        setAlert("Uma das senhas é inválida");
-    }
 }

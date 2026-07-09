@@ -50,7 +50,7 @@ function leadResult(res, setAlert, type) {
     }
 }
 
-async function setErrorAlert(alert, res) {
+async function setErrorAlert(setAlert, res) {
     const { error } = await res.json();
     setAlert(error);
 }
@@ -69,7 +69,7 @@ function redirectBy(type) {
 export async function redefinePassword(e, setAlert, userInfo) {
     e.preventDefault();
 
-    const [ oldPassword, newPassword, repeatPassword ] = getPasswordsBy(e.target);
+    const [oldPassword, newPassword, repeatPassword] = getPasswordsBy(e.target);
 
     if (newPassword === repeatPassword) {
         const res = await makeEditPasswordRequestBy(oldPassword, newPassword, `/account/${userInfo.type}/${userInfo.name}/edit/senha`);
@@ -84,7 +84,7 @@ export async function redefinePassword(e, setAlert, userInfo) {
 function getPasswordsBy(target) {
     return [
         target.pass.value,
-        target.newPasswordValue,
+        target.newPassword.value,
         target.repeatPassword.value
     ];
 }

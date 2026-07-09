@@ -7,6 +7,7 @@ const merchant = require("./api/comercial");
 const products = require("./api/products");
 const account = require("./api/account");
 const users = require("./api/users");
+const errors = require("./api/errors");
 
 //Começo do código
 const dev = process.env.NODE_ENV !== "production";
@@ -21,6 +22,7 @@ app.prepare().then(() => {
     server.use("/products", products);
     server.use("/account", account);
     server.use("/users", users);
+    server.use(errors);
 
     server.get("/api/myapi", (req, res) => {
         res.json({ msg: "Esta é uma resposta do express usando seu servidor personalizado" })
