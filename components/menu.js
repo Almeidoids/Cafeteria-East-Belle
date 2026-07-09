@@ -27,7 +27,8 @@ export default function Menu({ ref, style }) {
 
             if ("error" in login) return;
 
-            else setUser(login);
+            else setUser(login.user);
+            console.log(login);
         }
 
         verifyLogin();
@@ -47,7 +48,7 @@ export default function Menu({ ref, style }) {
                     <ButtonUserNotLogged />
                 }
                 {isLogged &&
-                    <ButtonUserLogged user={user.name} />
+                    <ButtonUserLogged user={user.name} type={user.type} />
                 }
 
                 <button
@@ -104,7 +105,10 @@ function ButtonUserNotLogged({ }) {
     )
 }
 
-function ButtonUserLogged({ user }) {
+function ButtonUserLogged({ user, type }) {
+    const pathEdit = type === "client" ? "/usuario/editarConta" : "/comercial/fornecedor/editarConta";
+
+
     return (
         <div className={`${styles.Link} ${styles.desaparecer} dropdown`}>
             <button
@@ -117,7 +121,7 @@ function ButtonUserLogged({ user }) {
             </button>
             <div className="dropdown-menu" style={{ backgroundColor: "#2b061e", width: "100%" }}>
                 <h6 className={styles.titleUser}>{user}</h6>
-                <Link className={styles.dropdownLinks} href="/usuario/editarConta"><button className={styles.button}>Editar conta</button></Link>
+                <Link className={styles.dropdownLinks} href={pathEdit}><button className={styles.button}>Editar conta</button></Link>
                 <Link className={styles.dropdownLinks} href="/comercial/login"><button className={styles.button}>Meus pedidos</button></Link>
                 <button className={styles.button} onClick={exitAccount} >Sair da conta</button>
             </div>

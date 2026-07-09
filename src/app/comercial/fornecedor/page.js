@@ -51,6 +51,9 @@ export default function Fornecedor({ }) {
         async function verifyLogin() {
             const login = await logged(setIsLogged);
 
+            console.log(login);
+            console.log(login.name);
+
             if ("error" in login || login.type !== "supplier") {
                 setReqError(login.error);
                 setTimeout(() => redirect(`/comercial/cadastro`), 1000 * 10);
