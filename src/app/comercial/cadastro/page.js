@@ -17,7 +17,7 @@ import styles from "../../../../style/cadastro.module.css"
 import { candal } from "../../../../public/fonts/fonts"
 
 // Util
-import logged from "../../../../util/authentication";
+import { verifyLogin } from "../../../../util/authentication";
 
 export default function Cadastro() {
     const refCnpj = useRef(null);
@@ -26,16 +26,10 @@ export default function Cadastro() {
     const [isLogged, setIsLogged] = useState(false);
 
     useEffect(() => {
-        async function verifyLogin() {
-            const login = await logged(setIsLogged);
-
-            if ("error" in login) return;
-
-            else setTimeout(() => redirect(`/comercial/fornecedor/`), 1000 * 10);
-        }
-
-        verifyLogin();
-
+        verifyLogin(setIsLogged)
+            .then(value => {
+                if (value) setTimeout(() => redirect(`/comercial/fornecedor/`), 1000 * 10);
+            });
     }, [])
 
     useEffect(() => {

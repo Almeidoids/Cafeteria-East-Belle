@@ -17,11 +17,19 @@ import styles from "../../../../style/cadastro.module.css"
 import { candal } from "../../../../public/fonts/fonts"
 
 // UTIL
-import logged from "../../../../util/authentication";
+import { verifyLogin } from "../../../../util/authentication";
 
 export default function Cadastro() {
     const [alert, setAlert] = useState(null);
     const [isLogged, setIsLogged] = useState(false);
+
+    useEffect(() => {
+        verifyLogin(setIsLogged)
+            .then(value => {
+                if (value) setTimeout(() => redirect("/"), 1000 * 2);
+            });
+
+    }, [])
 
     return (
         <div className={candal.variable}>

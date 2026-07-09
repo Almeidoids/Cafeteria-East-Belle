@@ -15,24 +15,17 @@ import { candal } from "../public/fonts/fonts"
 import Carrinho from "./carrinho";
 
 // Util
-import logged from "../util/authentication";
+import { verifyLogin } from "../util/authentication";
 
 export default function Menu({ ref, style }) {
     const [isLogged, setIsLogged] = useState(false);
     const [user, setUser] = useState("");
 
     useEffect(() => {
-        async function verifyLogin() {
-            const login = await logged(setIsLogged);
-
-            if ("error" in login) return;
-
-            else setUser(login.user);
-            console.log(login);
-        }
-
-        verifyLogin();
-
+        verifyLogin(setIsLogged)
+            .then(value => {
+                if (value) setUser(value)
+            });
     }, [])
 
     return (

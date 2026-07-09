@@ -17,50 +17,45 @@ import styles from "../../../../style/cadastro.module.css"
 import { candal } from "../../../../public/fonts/fonts"
 
 // Util
-import logged from "../../../../util/authentication";
+import { verifyLogin } from "../../../../util/authentication";
 import editAccount from "../../../../util/account";
 
 export default function EditarConta() {
     const [alert, setAlert] = useState(null);
-    const [isLogged, setIsLogged] = useState(false);
+    const [isLogged, setIsLogged] = useState(true);
     const [bdDate, setBdData] = useState(null);
     const [name, setName] = useState("");
     const [email, setEmail] = useState("");
     const [address, setAddress] = useState("");
+    const [reqError, setReqError] = useState("");
 
     useEffect(() => {
         async function getParams() {
-            const user = await verifyLogin();
+            let user = "";
 
-            if (user) {
-                const res = await fetch(`/account/client/${user}/edit`);
-
-                if (!res.ok) {
-                    console.log("erro");
-                    return;
-                }
-
-                const result = await res.json();
-                const { data } = result;
-
-                setBdData({ data, type: "client" });
-
-                setName(data.name);
-                setEmail(data.email);
-                setAddress(data.address);
+            try {
+                user = await verifyLogin(setIsLogged).name;
             }
-        }
-
-        async function verifyLogin() {
-            const login = await logged(setIsLogged);
-
-            if ("error" in login || login.type !== "client") {
-                setReqError(login.error);
+            catch (err) {
+                setReqError(err.message);
                 setTimeout(() => redirect(`/`), 2000);
+            }
+
+            const res = await fetch(`/account/client/${user}/edit`);
+
+            if (!res.ok) {
+                console.log("erro");
                 return;
             }
 
-            else return login.name;
+            const result = await res.json();
+            const { data } = result;
+
+            setBdData({ data, type: "client" });
+
+            setName(data.name);
+            setEmail(data.email);
+            setAddress(data.address);
         }
 
         getParams();
@@ -78,41 +73,41 @@ export default function EditarConta() {
             }
 
             {isLogged &&
-                <form className={styles.form} onSubmit={(e) => editAccount(e, bdDate, setAlert)} style = {{width: "40%"}}>
+                <form className={styles.form} onSubmit={(e) => editAccount(e, bdDate, setAlert)} style={{ width: "40%" }}>
                     <label className={styles.lbl} htmlFor="name">Nome completo</label>
-                    <input 
-                        required 
-                        className={styles.input} 
-                        type="text" 
-                        name="name" 
-                        value = {name}
-                        onChange = {(e) => setName(e.target.value)}
+                    <input
+                        required
+                        className={styles.input}
+                        type="text"
+                        name="name"
+                        value={name}
+                        onChange={(e) => setName(e.target.value)}
                     />
                     <label className={styles.lbl} htmlFor="email">Email</label>
-                    <input 
-                        required 
-                        className={styles.input} 
-                        type="email" 
-                        name="email" 
-                        value = {email}
-                        onChange = {(e) => setEmail(e.target.value)}
+                    <input
+                        required
+                        className={styles.input}
+                        type="email"
+                        name="email"
+                        value={email}
+                        onChange={(e) => setEmail(e.target.value)}
                     />
                     <label className={styles.lbl} htmlFor="address">Endereço</label>
-                    <input 
-                        required 
-                        className={styles.input} 
-                        type="text" 
-                        name="address" 
-                        value = {address}
-                        onChange = {(e) => setAddress(e.target.value)}
+                    <input
+                        required
+                        className={styles.input}
+                        type="text"
+                        name="address"
+                        value={address}
+                        onChange={(e) => setAddress(e.target.value)}
                     />
 
                     <div className={styles.btnalgn}>
-                        <Link href = "/usuario/editarConta/senha" style = {{width: "30%"}} >
-                            <button className={styles.btnSubmit} style = {{backgroundColor: "#797D81", width: "100%"}}>Editar senha</button>
+                        <Link href="/usuario/editarConta/senha" style={{ width: "30%" }} >
+                            <button className={styles.btnSubmit} style={{ backgroundColor: "#797D81", width: "100%" }}>Editar senha</button>
                         </Link>
-                        <button className={styles.btnReset} style = {{width: "30%"}} onClick= {() => clear(setName, setEmail, setAddress)} >Redefinir</button>
-                        <button type="submit" className={styles.btnSubmit} style = {{width: "30%"}}>Atualizar</button>
+                        <button className={styles.btnReset} style={{ width: "30%" }} onClick={() => clear(setName, setEmail, setAddress)} >Redefinir</button>
+                        <button type="submit" className={styles.btnSubmit} style={{ width: "30%" }}>Atualizar</button>
                     </div>
                 </form>
             }

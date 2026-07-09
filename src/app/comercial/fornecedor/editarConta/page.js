@@ -14,7 +14,7 @@ import BackBtn from "../../../../../components/backBtn";
 import Alert from "../../../../../components/alert";
 
 // UTIL
-import logged from "../../../../../util/authentication";
+import { verifyLogin } from "../../../../../util/authentication";
 import editAccount from "../../../../../util/account";
 
 // Fontes
@@ -32,40 +32,33 @@ export default function EditSupplier({ }) {
 
     useEffect(() => {
         async function getParams() {
-            const fornecedor = await verifyLogin();
+            let fornecedor = "";
 
-            if (fornecedor) {
-                const res = await fetch(`/account/supplier/${fornecedor}/edit`);
-
-                console.log(fornecedor);
-                setPath(fornecedor);
-
-                if (!res.ok) {
-                    return;
-                }
-
-                const result = await res.json();
-                const { data } = result;
-
-                setBdData({ data, type: "supplier" });
-
-                setName(data.name);
-                setEmail(data.email);
-                setAddress(data.address);
+            try {
+                fornecedor = await verifyLogin(setIsLogged).name;
             }
-        }
-
-        async function verifyLogin() {
-            const login = await logged(setIsLogged);
-
-            if ("error" in login || login.type !== "supplier") {
-                console.log(login);
+            catch (err) {
                 setReqError(login.error);
-                setTimeout(() => redirect(`/comercial/cadastro`), 1000 * 10);
+                setTimeout(() => redirect(`/comercial/cadastro`), 1000 * 2);
+            }
+
+            const res = await fetch(`/account/supplier/${fornecedor}/edit`);
+
+            console.log(fornecedor);
+            setPath(fornecedor);
+
+            if (!res.ok) {
                 return;
             }
 
-            else return login.name;
+            const result = await res.json();
+            const { data } = result;
+
+            setBdData({ data, type: "supplier" });
+
+            setName(data.name);
+            setEmail(data.email);
+            setAddress(data.address);
         }
 
         getParams();
@@ -82,7 +75,7 @@ export default function EditSupplier({ }) {
                 <div>
                     <BackBtn onClick={() => redirect(`/comercial/fornecedor`)} />
 
-                    <form onSubmit={(e) => editAccount(e, bdData, setAlert)} className = {styles.editForm}>
+                    <form onSubmit={(e) => editAccount(e, bdData, setAlert)} className={styles.editForm}>
                         <div className={`${styles.algnInputs} ${styles.algnEdtSupplier}`}>
                             <label className={`${styles.lbl} ${styles.lblEdtSupplier}`} htmlFor="name" >Nome:</label>
                             <input
@@ -116,7 +109,7 @@ export default function EditSupplier({ }) {
                         </div>
 
                         <div className={styles.organization}>
-                        <Link href = {`/comercial/fornecedor/editarConta/senha`}><button type = "button" className = {`btn ${styles.buttonPassword}`}>Redefinir senha</button></Link>
+                            <Link href={`/comercial/fornecedor/editarConta/senha`}><button type="button" className={`btn ${styles.buttonPassword}`}>Redefinir senha</button></Link>
                             <input
                                 type="reset"
                                 className={`btn ${styles.buttonReset}`}

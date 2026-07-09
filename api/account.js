@@ -104,7 +104,7 @@ app.route("/:type/:username/edit").get(connect, async (req, res) => {
             user = await Supplier.findOne({ name: username }).exec();
         }
 
-        if (!user) return throw new HTTPErrors("Usuario não encontrado", 404);
+        if (!user) throw new HTTPErrors("Usuario não encontrado", 404);
 
         const data = {
             id: user._id,
@@ -117,7 +117,7 @@ app.route("/:type/:username/edit").get(connect, async (req, res) => {
     }
 
     catch (err) {
-        res.status(500).json({ err: "Erro ao editar usuário" });
+       next(err);
     }
 })
     .post(connect, async (req, res) => {
@@ -148,8 +148,6 @@ app.route("/:type/:username/edit").get(connect, async (req, res) => {
 
 app.post("/:type/:username/edit/senha", connect, async (req, res) => {
     const { oldPassword, newPassword } = req.body;
-    console.log(oldPassword);
-    console.log(newPassword);
     const { username, type } = req.params;
     let user = null;
 

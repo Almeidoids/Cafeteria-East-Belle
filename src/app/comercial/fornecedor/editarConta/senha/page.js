@@ -16,7 +16,7 @@ import Alert from "../../../../../../components/alert";
 import { candal } from "../../../../../../public/fonts/fonts";
 
 // functions
-import logged from "../../../../../../util/authentication";
+import { verifyLogin } from "../../../../../../util/authentication";
 import { redefinePassword } from "../../../../../../util/account";
 
 export default function EditarSenha({ }) {
@@ -26,20 +26,12 @@ export default function EditarSenha({ }) {
     const [alert, setAlert] = useState(false);
 
     useEffect(() => {
-
-        async function verifyLogin() {
-            const login = await logged(setIsLogged);
-
-            if ("error" in login || login.type !== "supplier") {
+        verifyLogin(setIsLogged)
+            .then(value => setPath(value.name))
+            .catch(() => {
                 setReqError(login.error);
                 setTimeout(() => redirect(`/comercial/cadastro`), 1000 * 10);
-                return;
-            }
-
-            else setPath(login.name);
-        }
-
-        verifyLogin();
+            })
     }, [])
 
     return (

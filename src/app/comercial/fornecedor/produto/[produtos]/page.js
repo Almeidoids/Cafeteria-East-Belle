@@ -13,7 +13,7 @@ import { candal, caveat } from "../../../../../../public/fonts/fonts";
 
 // Funções
 import { cropper, imageEffect, getImage } from "../../../../../../util/CreateOrChangeImage";
-import logged from "../../../../../../util/authentication";
+import { verifyLogin } from "../../../../../../util/authentication";
 
 //Componentes
 import Modal from "../../../../../../components/modal";
@@ -48,11 +48,16 @@ export default function Produtos({ params }) {
     useEffect(() => {
         async function getParams() {
             const { produtos } = await params;
-            const fornecedor = await verifyLogin();
+            let name;
+            try {
+                name = await verifyLogin(setIsLogged).name;
+            }
+            catch (err) {
+                setReqError(err.message);
+                setTimeout(() => redirect(`/comercial/cadastro`), 1000 * 2);
+            }
 
-            if (!fornecedor) return;
-
-            setPath({ produtos, fornecedor });
+            setPath({ produtos, name });
 
             if (produtos !== "0") {
                 const res = await fetch(`/comercial/fornecedor/produto/edit/${produtos}`, {
@@ -89,19 +94,6 @@ export default function Produtos({ params }) {
             }
         }
 
-        async function verifyLogin() {
-            const login = await logged(setIsLogged);
-
-            if ("error" in login || login.type !== "supplier") {
-                console.log(login);
-                setReqError(login.error);
-                setTimeout(() => redirect(`/comercial/cadastro`), 1000 * 10);
-                return;
-            }
-
-            else return login.name;
-        }
-
         getParams();
 
     }, []);
@@ -115,7 +107,7 @@ export default function Produtos({ params }) {
 
             {isLogged &&
                 <div>
-                    <BackBtn onClick = {() => redirect(`/comercial/fornecedor`)} />
+                    <BackBtn onClick={() => redirect(`/comercial/fornecedor`)} />
 
                     <form onSubmit={(e) => postForm(e, sendImage, path, setAlert, bdData)} >
 
@@ -142,7 +134,7 @@ export default function Produtos({ params }) {
                                     onChange={(e) => setDescription(e.target.value)}
                                 />
                             </div>
-                            
+
                             <div>
 
                                 <div className={styles.algnImage} >
@@ -371,7 +363,7 @@ async function postForm(e, images, path, setAlert, bdData) {
                 else {
                     const view1 = new Uint8Array(buffer1);
                     const view2 = new Uint8Array(buffer2);
-                    
+
                     for (let j = 0; j < view1.byteLength; j++) {
                         if (view1[j] !== view2[j]) {
                             change = true;

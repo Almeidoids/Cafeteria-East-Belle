@@ -17,29 +17,22 @@ import styles from "../../../../../style/cadastro.module.css"
 import { candal } from "../../../../../public/fonts/fonts"
 
 // Util
-import logged from "../../../../../util/authentication";
+import { verifyLogin } from "../../../../../util/authentication";
 import editAccount, { redefinePassword } from "../../../../../util/account";
 
 export default function EditarConta() {
     const [alert, setAlert] = useState(null);
-    const [isLogged, setIsLogged] = useState(false);
+    const [isLogged, setIsLogged] = useState(true);
     const [username, setUsername] = useState("");
+    const [reqError, setReqError] = useState("");
 
     useEffect(() => {
-        async function verifyLogin() {
-            const login = await logged(setIsLogged);
-
-            if ("error" in login || login.type !== "client") {
-                setReqError(login.error);
+        verifyLogin(setIsLogged)
+            .then(value => setUsername(value.name))
+            .catch(err => {
+                setReqError(err.message);
                 setTimeout(() => redirect(`/`), 2000);
-                return;
-            }
-
-            else setUsername(login.name);
-        }
-
-        verifyLogin();
-
+            });
     }, []);
 
     return (

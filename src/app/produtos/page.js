@@ -16,7 +16,7 @@ import styles from "../../../style/produtos.module.css"
 
 // UTIL
 import { getImage } from "../../../util/CreateOrChangeImage";
-import logged from "../../../util/authentication";
+import { verifyLogin } from "../../../util/authentication";
 
 export default function Produtos() {
 
@@ -25,16 +25,6 @@ export default function Produtos() {
     const [isLogged, setIsLogged] = useState(true);
 
     useEffect(() => {
-        async function verifyLogin() {
-            const login = await logged(setIsLogged);
-
-            if (!("error" in login) && login.type === "supplier") {
-                const supplierId = await getSupplier(login);
-                
-                getProducts(supplierId);
-            }
-        }
-
         async function getSupplier(login) {
             const res = await fetch(`/account/supplier/${login.name}`);
 
@@ -86,7 +76,15 @@ export default function Produtos() {
             }
         }
 
-        verifyLogin();
+        verifyLogin(setIsLogged)
+            .then(async function (value) {
+                if (value && value.type === "supplier") {
+                    const supplierId = await getSupplier(login);
+                    getProducts(supplierId);
+                }
+            })
+            .catch(() => return);
+
     }, [])
 
     useEffect(() => {

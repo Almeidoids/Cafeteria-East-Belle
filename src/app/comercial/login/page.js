@@ -17,7 +17,7 @@ import styles from "../../../../style/cadastro.module.css"
 import { candal } from "../../../../public/fonts/fonts"
 
 // UTIL
-import logged from "../../../../util/authentication";
+import { verifyLogin } from "../../../../util/authentication";
 
 export default function Cadastro() {
     const refCnpj = useRef(null);
@@ -26,16 +26,9 @@ export default function Cadastro() {
     const [isLogged, setIsLogged] = useState(false);
 
     useEffect(() => {
-        async function verifyLogin() {
-            const login = await logged(setIsLogged);
-
-            if ("error" in login) return;
-
-            else setTimeout(() => redirect(`/comercial/fornecedor/`), 1000 * 10);
-        }
-
-        verifyLogin();
-
+        verifyLogin(setIsLogged)
+            .then(() => setTimeout(() => redirect(`/comercial/fornecedor/`), 1000 * 10))
+            .catch();
     }, [])
 
     useEffect(() => {
@@ -54,9 +47,9 @@ export default function Cadastro() {
         <div className={candal.variable}>
             <Menu style={{ position: "fixed", top: 0 }} />
             {isLogged &&
-                <Authenticated 
-                    text = {"Sua sessão já existe. Redirecionando"} 
-                    color = {"#2B061E"}
+                <Authenticated
+                    text={"Sua sessão já existe. Redirecionando"}
+                    color={"#2B061E"}
                 />
             }
             {!isLogged &&
@@ -76,7 +69,7 @@ export default function Cadastro() {
                     <label className={styles.lbl} htmlFor="password">Senha</label>
                     <input required className={styles.input} type="password" name="password" />
 
-                    <Link href = "/comercial/cadastro" className = {styles.link}>Não tem uma conta? Faça seu cadastro</Link>
+                    <Link href="/comercial/cadastro" className={styles.link}>Não tem uma conta? Faça seu cadastro</Link>
 
                     <div className={styles.btnalgn}>
                         <input type="reset" className={styles.btnReset} />

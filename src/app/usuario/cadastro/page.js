@@ -17,13 +17,19 @@ import styles from "../../../../style/cadastro.module.css"
 import { candal } from "../../../../public/fonts/fonts"
 
 // Util
-import logged from "../../../../util/authentication";
+import { verifyLogin } from "../../../../util/authentication";
 
 export default function Cadastro() {
     const refCpf = useRef(null);
     const [cpf, setCpf] = useState(null);
     const [alert, setAlert] = useState(null);
     const [isLogged, setIsLogged] = useState(false);
+    useEffect(() => {
+        verifyLogin(setIsLogged)
+            .then(value => {
+                if (value) setTimeout(() => redirect(`/`), 1000 * 2);
+            });
+    }, [])
 
     useEffect(() => {
         const actualCpf = refCpf.current.value;

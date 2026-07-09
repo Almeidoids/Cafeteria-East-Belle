@@ -1,4 +1,4 @@
-export default async function logged(setIsLogged) {
+export async function logged(setIsLogged) {
     const res = await fetch(`/account`, {
         method: "GET",
         headers: { "Content-Type": "application/json" }
@@ -14,6 +14,13 @@ export default async function logged(setIsLogged) {
 
         setIsLogged(true);
 
-        return { user };
+        return user;
     }
 }
+
+export async function verifyLogin(setIsLogged) {
+    const login = await logged(setIsLogged);
+    if ("error" in login) throw new Error(login.error);
+    else return login;
+}
+

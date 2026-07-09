@@ -19,7 +19,7 @@ import BackBtn from "../../../../components/backBtn";
 import Dropdown from "../../../../components/dropdown";
 
 // Util
-import logged from "../../../../util/authentication";
+import { verifyLogin } from "../../../../util/authentication";
 
 // Constants
 // import produtos from "../../../../constants/produtos";
@@ -48,22 +48,16 @@ export default function Fornecedor({ }) {
     }, []);
 
     useEffect(() => {
-        async function verifyLogin() {
-            const login = await logged(setIsLogged);
-
-            console.log(login);
-            console.log(login.name);
-
-            if ("error" in login || login.type !== "supplier") {
-                setReqError(login.error);
-                setTimeout(() => redirect(`/comercial/cadastro`), 1000 * 10);
-            }
-
-            else return login.name;
-        }
-
         async function getSupplier() {
-            const fornecedor = await verifyLogin();
+            let fornecedor = "";
+
+            try {
+                fornecedor = await verifyLogin(setIsLogged);
+            }
+            catch (err) {
+                setReqError(login.error);
+                setTimeout(() => redirect(`/comercial/cadastro`), 1000 * 2);
+            }
 
             const res = await fetch(`/comercial/fornecedor/get/${fornecedor}`, {
                 method: "GET",
