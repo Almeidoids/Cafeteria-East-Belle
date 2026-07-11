@@ -1,15 +1,14 @@
 const express = require("express");
 const app = express.Router();
-const bcrypt = require("bcrypt");
 const multer = require("multer")
 const upload = multer();
 
 // UTIL
 const connect = require("./util/connect");
-const { setTkn } = require("./util/authentication");
 
 //Constants
 const { Supplier, Products} = require("./models/models");
+const HTTPErrors = require("./util/HTTPErrors");
 
 app.use(express.json());
 
@@ -17,13 +16,13 @@ app.use(express.json());
 app.get("/fornecedor/get/:fornecedor", connect,
 
     // Função para pegar informações do fornecedor
-    async function (req, res) {
+    async function (req, res, next) {
         const name = req.params.fornecedor; // Pega o nome do fornecedor
 
         try {
             const supplier = await Supplier.findOne({ name: name }).exec(); // Encontra o fornecedor pelo nome no BD
 
-            if (!supplier) return res.status(404).json({ error: "Usuario não encontrado" }); // Caso não encontre, retorna erro
+            if (!supplier) throw new HTTPErrors("Usuário não encontrado", 404)
 
             const products = await Products.find({ supplier: supplier._id }).exec();
 
@@ -45,15 +44,14 @@ app.get("/fornecedor/get/:fornecedor", connect,
             res.json({ data: data }); // Envia a variavel data como resposta 
         }
         catch (err) { // Caso dê erro, retorna status 500, como a exceção na resposta
-            console.log(err);
-            res.status(500).json({ error: "Erro ao entrar" });
+            next(err)
         }
     }
 )
 
 app.route("/fornecedor/produto").post(upload.array("image", 4), connect,
 
-    async function (req, res) {
+    async function (req, res, next) {
         const { name, description, price, quantity, offer, supplierName } = JSON.parse(req.body.items);
         const images = [];
 
@@ -80,7 +78,7 @@ app.route("/fornecedor/produto").post(upload.array("image", 4), connect,
 
         }
         catch (err) {
-            res.status(500).json({ error: "Erro ao cadastrar produtos" });
+            next(err);
         }
     }
 )
@@ -96,48 +94,17 @@ app.route("/fornecedor/produto").post(upload.array("image", 4), connect,
     }
 
     catch (err) {
-        console.log(err);
-        res.status(500).json({ err: "Erro ao deletar produto" });
+        next(err);
     }
 });
 
-app.post("/fornecedor/:fornecedor/edit/senha", connect, async (req, res) => {
-    const {oldPassword, newPassword} = req.body;
-    const {fornecedor} = req.params;
-
-    try {
-        const supplier = await Supplier.findOne({name: fornecedor}).exec();
-
-        if (!supplier) throw new Error();
-
-        const verifyPassword = await bcrypt.compare(oldPassword, supplier.password);
-
-        if (verifyPassword) {
-            const cryPassword = await bcrypt.hash(newPassword, 10);
-
-            supplier.password = cryPassword;
-            await supplier.save();
-
-            res.send("Sucesso");
-        }
-
-        else {
-            res.status(401).json({error: "Uma das senhas é inválida"});
-        }
-    }
-
-    catch (err) {
-        res.status(500).json({error: "Erro ao trocar senha"});
-    }
-})
-
-app.route("/fornecedor/produto/edit/:id").get(connect, async (req, res) => {
+app.route("/fornecedor/produto/edit/:id").get(connect, async (req, res, next) => {
     const { id } = req.params;
 
     try {
         const product = await Products.findById(id).exec();
 
-        if (!product) return res.status(404).json({err: "Produto não encontrado!"});
+        if (!product) throw new HTTPErrors("Produto não encontrado.", 404);
 
         const data = {
             id: product._id,
@@ -153,10 +120,10 @@ app.route("/fornecedor/produto/edit/:id").get(connect, async (req, res) => {
     }
 
     catch (err) {
-        res.status(500).json({ err: "Erro ao capturar os produtos" });
+        next(err);
     }
 })
-.post(upload.array("image", 4), connect, async (req, res) => {
+.post(upload.array("image", 4), connect, async (req, res, next) => {
     console.log(req.body);
     const items = JSON.parse(req.body.items);
     const images = [];
@@ -174,19 +141,17 @@ app.route("/fornecedor/produto/edit/:id").get(connect, async (req, res) => {
     }
     
     catch (err) {
-        console.log(err);
-        res.status(500).json({ err: "Erro ao atualizar produto" });
+        next(err);
     }
 })
 
 app.post("/fornecedor/:fornecedor/editAll", connect, async (req, res) => {
     const listEdit = req.body;
-
-    console.log(listEdit);
-
+    
     const operation = listEdit.map(item => {
         const editQuery = {updateOne: {filter: {}, update: {$set: {}}}};
-        const result = Object.entries(item).map(([key, val]) => {
+        
+        Object.entries(item).map(([key, val]) => {
             if (key === "_id") {
                 editQuery.updateOne.filter = {[key] : val};
             }
@@ -195,7 +160,6 @@ app.post("/fornecedor/:fornecedor/editAll", connect, async (req, res) => {
             }
         });
 
-        console.dir(editQuery, {depth: null});
         return (editQuery);
     })
 
@@ -205,23 +169,18 @@ app.post("/fornecedor/:fornecedor/editAll", connect, async (req, res) => {
     }
 
     catch (err) {
-        res.status(500).json({err: "Não foi possivel salvar produtos"});
-        console.log(err);
+        next(err);
     }
 })
 
 app.delete("/fornecedor/produto/delete/:id", connect, async (req, res) => {
     const { id } = req.params;
-
     try {
         await Products.findByIdAndDelete(id);
-
         res.send("sucesso");
     }
-
     catch (err) {
-        console.log(err);
-        res.status(500).json({ err: "Erro ao deletar produto" });
+        next(err);
     }
 })
 

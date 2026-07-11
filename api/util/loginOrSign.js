@@ -57,7 +57,7 @@ async function getUser(identifier, type) {
     }
 
     if (type === "supplier") {
-        user = await Supplier.findOne({ cnpj: identifier }).exec();
+        user = await Supplier.findOne({ cnpj_cpf: identifier }).exec();
     }
 
     return user;

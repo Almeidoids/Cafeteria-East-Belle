@@ -5,7 +5,6 @@ const app = express.Router();
 app.use(express.json());
 
 app.post("/", async function (req, res, next) {
-    console.log(await req.body);
     req.name = req.body.Nome;
     req.lastName = req.body.Sobrenome;
     req.email = req.body.Email;
@@ -22,7 +21,7 @@ app.post("/", async function (req, res, next) {
     });
 
     next();
-}, function (req, res) {
+}, function (req, res, next) {
     req.transport.sendMail({
         from: "Cafeteria East Belle <cafeteriaeastbelle@gmail.com>",
         to: req.email,
@@ -31,7 +30,7 @@ app.post("/", async function (req, res, next) {
         text: `Obrigado por fazer sua pergunta ${req.name} ${req.lastname}, logo iremos responde-lá.`,
     })
     .then(() => res.json({text: "email enviado"}))
-    .catch((err) => res.status(500).json({text: `Erro ao enviar email`}));
+    .catch(next);
 })
 
 module.exports = app;

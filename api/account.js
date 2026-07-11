@@ -44,7 +44,7 @@ app.post("/cadastro", connect,
             email: email,
             address: address,
             password: cryPassword,
-            [type === "client" ? "cpf" : "cnpj"]: identityDocument
+            [type === "client" ? "cpf" : "cnpj_cpf"]: identityDocument
         }
 
         const newUser = createUser(type, data);

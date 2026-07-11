@@ -5,7 +5,7 @@ const { Schema } = mongoose;
 const SupplierSchema = new Schema({
     name: { type: String, unique: true, required: true, },
     email: { type: String, required: true, },
-    cnpj: { type: String, unique: true, required: true, },
+    cnpj_cpf: { type: String, unique: true, required: true, },
     address: { type: String, required: true, },
     password: { type: String, required: true, },
 });

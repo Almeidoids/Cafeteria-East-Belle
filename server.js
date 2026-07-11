@@ -6,7 +6,6 @@ const contact = require("./api/contato");
 const merchant = require("./api/comercial");
 const products = require("./api/products");
 const account = require("./api/account");
-const users = require("./api/users");
 const errors = require("./api/errors");
 
 //Começo do código
@@ -21,7 +20,6 @@ app.prepare().then(() => {
     server.use("/comercial", merchant);
     server.use("/products", products);
     server.use("/account", account);
-    server.use("/users", users);
     server.use(errors);
 
     server.get("/api/myapi", (req, res) => {

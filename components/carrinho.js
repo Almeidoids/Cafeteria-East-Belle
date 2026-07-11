@@ -137,11 +137,6 @@ export default function Carrinho() {
 }
 
 async function openAlert(setAlert, cart, setCart, setShowModal) {
-    // cart.forEach(function (value) {
-    //     produtos[value.id].buyed += value.amount;
-        // produtos[value.id].quantity = subQuantity(produtos[Number(value.id) - 1], value);
-    // })
-
     const data = {cart};
 
     const res = await fetch("/products/buy", {

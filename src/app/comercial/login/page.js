@@ -101,7 +101,7 @@ async function login(e, setAlert) {
     if (!res.ok) {
         const error = await res.json();
         console.log(error);
-        setAlert(error.error)
+        setAlert(error.err)
     }
     else {
         const result = await res.json();
