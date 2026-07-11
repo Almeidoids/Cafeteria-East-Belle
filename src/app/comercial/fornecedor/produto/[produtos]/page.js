@@ -50,7 +50,8 @@ export default function Produtos({ params }) {
             const { produtos } = await params;
             let name;
             try {
-                name = await verifyLogin(setIsLogged).name;
+                name = await verifyLogin(setIsLogged)
+                    .then(value => value.name);
             }
             catch (err) {
                 setReqError(err.message);

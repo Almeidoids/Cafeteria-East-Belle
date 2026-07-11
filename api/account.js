@@ -92,7 +92,7 @@ app.post("/login", connect,
     setTkn
 );
 
-app.route("/:type/:username/edit").get(connect, async (req, res) => {
+app.route("/:type/:username/edit").get(connect, async (req, res, next) => {
     const { username, type } = req.params;
     let user = null;
 
@@ -146,7 +146,7 @@ app.route("/:type/:username/edit").get(connect, async (req, res) => {
     }
     )
 
-app.post("/:type/:username/edit/senha", connect, async (req, res) => {
+app.post("/:type/:username/edit/senha", connect, async (req, res, next) => {
     const { oldPassword, newPassword } = req.body;
     const { username, type } = req.params;
     let user = null;

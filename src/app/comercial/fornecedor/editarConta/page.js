@@ -35,7 +35,8 @@ export default function EditSupplier({ }) {
             let fornecedor = "";
 
             try {
-                fornecedor = await verifyLogin(setIsLogged).name;
+                fornecedor = await verifyLogin(setIsLogged)
+                    .then(value => value.name);
             }
             catch (err) {
                 setReqError(login.error);

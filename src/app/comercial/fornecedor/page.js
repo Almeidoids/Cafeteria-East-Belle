@@ -52,7 +52,8 @@ export default function Fornecedor({ }) {
             let fornecedor = "";
 
             try {
-                fornecedor = await verifyLogin(setIsLogged);
+                fornecedor = await verifyLogin(setIsLogged)
+                    .then(value => value.name);
             }
             catch (err) {
                 setReqError(login.error);

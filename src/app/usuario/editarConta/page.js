@@ -34,7 +34,8 @@ export default function EditarConta() {
             let user = "";
 
             try {
-                user = await verifyLogin(setIsLogged).name;
+                user = await verifyLogin(setIsLogged)
+                .then((value) => value.name);
             }
             catch (err) {
                 setReqError(err.message);
