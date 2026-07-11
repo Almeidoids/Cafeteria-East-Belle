@@ -78,12 +78,12 @@ export default function Produtos() {
 
         verifyLogin(setIsLogged)
             .then(async function (value) {
-                if (value && value.type === "supplier") {
-                    const supplierId = await getSupplier(login);
+                if (value.type === "supplier") {
+                    const supplierId = await getSupplier(value);
                     getProducts(supplierId);
                 }
             })
-            .catch(() => return);
+            .catch();
 
     }, [])
 

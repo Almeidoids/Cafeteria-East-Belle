@@ -27,9 +27,8 @@ export default function Cadastro() {
 
     useEffect(() => {
         verifyLogin(setIsLogged)
-            .then(value => {
-                if (value) setTimeout(() => redirect(`/comercial/fornecedor/`), 1000 * 10);
-            });
+            .then(() => setTimeout(() => redirect(`/comercial/fornecedor/`), 1000 * 2))
+            .catch();
     }, [])
 
     useEffect(() => {

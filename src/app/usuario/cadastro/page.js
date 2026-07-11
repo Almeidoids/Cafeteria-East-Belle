@@ -26,9 +26,8 @@ export default function Cadastro() {
     const [isLogged, setIsLogged] = useState(false);
     useEffect(() => {
         verifyLogin(setIsLogged)
-            .then(value => {
-                if (value) setTimeout(() => redirect(`/`), 1000 * 2);
-            });
+            .then(() => setTimeout(() => redirect(`/`), 1000 * 2))
+            .catch();
     }, [])
 
     useEffect(() => {

@@ -25,7 +25,8 @@ export default function Menu({ ref, style }) {
         verifyLogin(setIsLogged)
             .then(value => {
                 if (value) setUser(value)
-            });
+            })
+            .catch();
     }, [])
 
     return (

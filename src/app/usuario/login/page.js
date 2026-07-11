@@ -25,10 +25,8 @@ export default function Cadastro() {
 
     useEffect(() => {
         verifyLogin(setIsLogged)
-            .then(value => {
-                if (value) setTimeout(() => redirect("/"), 1000 * 2);
-            });
-
+            .then(() => setTimeout(() => redirect("/"), 1000 * 2))
+            .catch();
     }, [])
 
     return (
