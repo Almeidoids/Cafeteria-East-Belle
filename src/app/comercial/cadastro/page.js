@@ -20,10 +20,11 @@ import { candal } from "../../../../public/fonts/fonts"
 import { verifyLogin } from "../../../../util/authentication";
 
 export default function Cadastro() {
-    const refCnpj = useRef(null);
-    const [cnpj, setCnpj] = useState(null);
+    const refIdentityDocument = useRef(null);
+    const [identityDocument, setIdentityDocument] = useState(null);
     const [alert, setAlert] = useState(null);
     const [isLogged, setIsLogged] = useState(false);
+    const [isCpf, setIsCpf] = useState(false);
 
     useEffect(() => {
         verifyLogin(setIsLogged)
@@ -32,15 +33,15 @@ export default function Cadastro() {
     }, [])
 
     useEffect(() => {
-        const actualCnpj = refCnpj.current.value;
-        let updateCnpj = actualCnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
+        const actualIdentityDocument = refIdentityDocument.current.value;
+        let updateIdentityDocument = actualIdentityDocument.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
             function (regex, arg1, arg2, arg3, arg4, arg5) {
                 return arg1 + "." + arg2 + "." + arg3 + "/" + arg4 + "-" + arg5;
             }
         );
 
-        refCnpj.current.value = updateCnpj;
-    }, [cnpj]);
+        refIdentityDocument.current.value = updateIdentityDocument;
+    }, [identityDocument]);
 
     return (
         <div className={candal.variable}>
@@ -58,17 +59,21 @@ export default function Cadastro() {
                     <input required className={styles.input} type="text" name="name" />
                     <label className={styles.lbl} htmlFor="email">Email para contato</label>
                     <input required className={styles.input} type="email" name="email" />
-                    <label className={styles.lbl} htmlFor="cnpj">CNPJ</label>
-                    <input
-                        required
-                        className={`${styles.input} ${styles.cnpj}`}
-                        type="text"
-                        name="cnpj"
-                        pattern="\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}"
-                        maxLength={18}
-                        ref={refCnpj}
-                        onChange={(e) => setCnpj(e.currentTarget.value)}
-                    />
+                    <label className={styles.lbl} htmlFor="identityDocument">CNPJ</label>
+                    <div style={{ display: "flex", alignItems: "center", padding: 0 }}>
+                        <input
+                            required
+                            className={`${styles.input} ${styles.identityDocument}`}
+                            type="text"
+                            name="identityDocument"
+                            pattern="\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}"
+                            maxLength={18}
+                            ref={refIdentityDocument}
+                            onChange={(e) => setIdentityDocument(e.currentTarget.value)}
+                        />
+                        <input type="checkbox" name="cpfCheckbox" className={styles.activeCpf} />
+                        <label htmlFor="cpfCheckbox" style={{ fontSize: 12 }} className={`${candal.className}`}>CPF</label>
+                    </div>
                     <label className={styles.lbl} htmlFor="address">Endereço da loja ou fabricante</label>
                     <input required className={styles.input} type="text" name="address" />
                     <label className={styles.lbl} htmlFor="password">Senha</label>
@@ -95,7 +100,7 @@ async function cadastro(e, setAlert) {
     const data = {
         name: e.target.name.value,
         email: e.target.email.value,
-        identityDocument: e.target.cnpj.value,
+        cnpj_cpf: e.target.identityDocument.value,
         address: e.target.address.value,
         password: e.target.password.value,
         type: "supplier"
