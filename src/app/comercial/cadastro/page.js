@@ -21,7 +21,7 @@ import { verifyLogin } from "../../../../util/authentication";
 
 export default function Cadastro() {
     const refIdentityDocument = useRef(null);
-    const [identityDocument, setIdentityDocument] = useState(null);
+    const [identityDocument, setIdentityDocument] = useState("");
     const [alert, setAlert] = useState(null);
     const [isLogged, setIsLogged] = useState(false);
     const [isCpf, setIsCpf] = useState(false);
@@ -33,14 +33,16 @@ export default function Cadastro() {
     }, [])
 
     useEffect(() => {
-        const actualIdentityDocument = refIdentityDocument.current.value;
-        let updateIdentityDocument = actualIdentityDocument.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
-            function (regex, arg1, arg2, arg3, arg4, arg5) {
-                return arg1 + "." + arg2 + "." + arg3 + "/" + arg4 + "-" + arg5;
-            }
-        );
-
-        refIdentityDocument.current.value = updateIdentityDocument;
+        if (isCpf) {
+            setIdentityDocument(setFormatToIdentityDocument(
+                refIdentityDocument.current, /(\d{3})(\d{3})(\d{3})(\d{2})/, [".", ".", "-"]
+            ))
+        }
+        else {
+            setIdentityDocument(setFormatToIdentityDocument(
+                refIdentityDocument.current, /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, [".", ".", "/", "-"]
+            ))
+        }
     }, [identityDocument]);
 
     return (
@@ -59,19 +61,29 @@ export default function Cadastro() {
                     <input required className={styles.input} type="text" name="name" />
                     <label className={styles.lbl} htmlFor="email">Email para contato</label>
                     <input required className={styles.input} type="email" name="email" />
-                    <label className={styles.lbl} htmlFor="identityDocument">CNPJ</label>
+                    <label className={styles.lbl} htmlFor="identityDocument">{isCpf ? "CPF" : "CNPJ"}</label>
                     <div style={{ display: "flex", alignItems: "center", padding: 0 }}>
                         <input
                             required
                             className={`${styles.input} ${styles.identityDocument}`}
                             type="text"
                             name="identityDocument"
-                            pattern="\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}"
-                            maxLength={18}
+                            pattern={isCpf ? "\d{3}\.\d{3}\.\d{3}-\d{2}" : "\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}"}
+                            maxLength={isCpf ? 14 : 18}
+                            value = {identityDocument}
                             ref={refIdentityDocument}
                             onChange={(e) => setIdentityDocument(e.currentTarget.value)}
                         />
-                        <input type="checkbox" name="cpfCheckbox" className={styles.activeCpf} />
+                        <input 
+                            type="checkbox" 
+                            name="cpfCheckbox" 
+                            className={styles.activeCpf} 
+                            onChange = {(e) => {
+                                setIdentityDocument(changeCpfCheckbox(
+                                    setIsCpf, e.currentTarget.checked, refIdentityDocument.current.value
+                                ));
+                            }} 
+                        />
                         <label htmlFor="cpfCheckbox" style={{ fontSize: 12 }} className={`${candal.className}`}>CPF</label>
                     </div>
                     <label className={styles.lbl} htmlFor="address">Endereço da loja ou fabricante</label>
@@ -94,6 +106,34 @@ export default function Cadastro() {
     )
 }
 
+function setFormatToIdentityDocument(refIdentityDocument, regex, formatMasks) {
+    let updatedIdentityDocument = refIdentityDocument.value.replace(regex,(match, ...args) => {
+        return formatDocument(args.slice(0, -2), formatMasks);
+    });
+
+    updatedIdentityDocument = removeExcess(updatedIdentityDocument, refIdentityDocument.maxLength);
+    return updatedIdentityDocument;
+}
+
+function formatDocument(args, formatMasks) {
+    let finalFormat = "";
+
+    args.forEach(function (value, i) {
+        finalFormat += i >= formatMasks.length ? value : value + formatMasks[i];
+    })
+
+    return finalFormat;
+}
+
+function removeExcess(text, maxLen) {
+    if (text.length > maxLen) {
+        let numberOfTextToBeRemoved = text.length - maxLen;
+        text = text.slice(0, -numberOfTextToBeRemoved);
+    }
+
+    return text;
+}
+
 async function cadastro(e, setAlert) {
     e.preventDefault();
 
@@ -112,14 +152,21 @@ async function cadastro(e, setAlert) {
         body: JSON.stringify(data),
     })
 
-    console.log(res.ok);
 
     if (!res.ok) {
         const error = await res.json();
-        console.log(error);
         setAlert(error.error)
     }
     else {
         redirect(`/comercial/fornecedor`);
     }
+}
+
+function changeCpfCheckbox(setIsCpf, isChecked, value) {
+    setIsCpf(isChecked);
+    return removeMask(value);
+}
+
+function removeMask(text) {
+    return text.replace(/\D/g, "");
 }
