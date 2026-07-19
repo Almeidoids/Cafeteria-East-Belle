@@ -19,6 +19,7 @@ function identifyError(err) {
     }
 
     else {
+        console.log(err.message);
         return { code: 500, message: "Erro ao cadastrar usuário" }
     }
 }

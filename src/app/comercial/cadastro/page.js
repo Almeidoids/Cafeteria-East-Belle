@@ -18,6 +18,7 @@ import { candal } from "../../../../public/fonts/fonts"
 
 // Util
 import { verifyLogin } from "../../../../util/authentication";
+import { createMaskOf, removeMask } from "../../../../util/masks";
 
 export default function Cadastro() {
     const refIdentityDocument = useRef(null);
@@ -34,12 +35,12 @@ export default function Cadastro() {
 
     useEffect(() => {
         if (isCpf) {
-            setIdentityDocument(setFormatToIdentityDocument(
+            setIdentityDocument(createMaskOf(
                 refIdentityDocument.current, /(\d{3})(\d{3})(\d{3})(\d{2})/, [".", ".", "-"]
             ))
         }
         else {
-            setIdentityDocument(setFormatToIdentityDocument(
+            setIdentityDocument(createMaskOf(
                 refIdentityDocument.current, /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, [".", ".", "/", "-"]
             ))
         }
@@ -68,21 +69,21 @@ export default function Cadastro() {
                             className={`${styles.input} ${styles.identityDocument}`}
                             type="text"
                             name="identityDocument"
-                            pattern={isCpf ? "\d{3}\.\d{3}\.\d{3}-\d{2}" : "\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}"}
+                            pattern={isCpf ? "\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}" : "\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}-\\d{2}"}
                             maxLength={isCpf ? 14 : 18}
-                            value = {identityDocument}
+                            value={identityDocument}
                             ref={refIdentityDocument}
                             onChange={(e) => setIdentityDocument(e.currentTarget.value)}
                         />
-                        <input 
-                            type="checkbox" 
-                            name="cpfCheckbox" 
-                            className={styles.activeCpf} 
-                            onChange = {(e) => {
+                        <input
+                            type="checkbox"
+                            name="cpfCheckbox"
+                            className={styles.activeCpf}
+                            onChange={(e) => {
                                 setIdentityDocument(changeCpfCheckbox(
                                     setIsCpf, e.currentTarget.checked, refIdentityDocument.current.value
                                 ));
-                            }} 
+                            }}
                         />
                         <label htmlFor="cpfCheckbox" style={{ fontSize: 12 }} className={`${candal.className}`}>CPF</label>
                     </div>
@@ -106,41 +107,13 @@ export default function Cadastro() {
     )
 }
 
-function setFormatToIdentityDocument(refIdentityDocument, regex, formatMasks) {
-    let updatedIdentityDocument = refIdentityDocument.value.replace(regex,(match, ...args) => {
-        return formatDocument(args.slice(0, -2), formatMasks);
-    });
-
-    updatedIdentityDocument = removeExcess(updatedIdentityDocument, refIdentityDocument.maxLength);
-    return updatedIdentityDocument;
-}
-
-function formatDocument(args, formatMasks) {
-    let finalFormat = "";
-
-    args.forEach(function (value, i) {
-        finalFormat += i >= formatMasks.length ? value : value + formatMasks[i];
-    })
-
-    return finalFormat;
-}
-
-function removeExcess(text, maxLen) {
-    if (text.length > maxLen) {
-        let numberOfTextToBeRemoved = text.length - maxLen;
-        text = text.slice(0, -numberOfTextToBeRemoved);
-    }
-
-    return text;
-}
-
 async function cadastro(e, setAlert) {
     e.preventDefault();
 
     const data = {
         name: e.target.name.value,
         email: e.target.email.value,
-        cnpj_cpf: e.target.identityDocument.value,
+        identityDocument: e.target.identityDocument.value,
         address: e.target.address.value,
         password: e.target.password.value,
         type: "supplier"
@@ -155,7 +128,7 @@ async function cadastro(e, setAlert) {
 
     if (!res.ok) {
         const error = await res.json();
-        setAlert(error.error)
+        setAlert(error.err)
     }
     else {
         redirect(`/comercial/fornecedor`);
@@ -165,8 +138,4 @@ async function cadastro(e, setAlert) {
 function changeCpfCheckbox(setIsCpf, isChecked, value) {
     setIsCpf(isChecked);
     return removeMask(value);
-}
-
-function removeMask(text) {
-    return text.replace(/\D/g, "");
 }

@@ -23,6 +23,10 @@
     font-family: var(--candal);
 }
 
+.identityDocument {
+    margin-left: 0px;
+}
+
 .link {
     color: #F9DBBD;
     text-decoration: none;

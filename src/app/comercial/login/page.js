@@ -18,12 +18,14 @@ import { candal } from "../../../../public/fonts/fonts"
 
 // UTIL
 import { verifyLogin } from "../../../../util/authentication";
+import { createMaskOf, removeMask } from "../../../../util/masks";
 
 export default function Cadastro() {
-    const refCnpj = useRef(null);
-    const [cnpj, setCnpj] = useState(null);
+    const refIdentityDocument = useRef(null);
+    const [identityDocument, setIdentityDocument] = useState("");
     const [alert, setAlert] = useState(null);
     const [isLogged, setIsLogged] = useState(false);
+    const [isCpf, setIsCpf] = useState(false);
 
     useEffect(() => {
         verifyLogin(setIsLogged)
@@ -32,16 +34,17 @@ export default function Cadastro() {
     }, [])
 
     useEffect(() => {
-        const actualCnpj = refCnpj.current.value;
-        let updateCnpj = actualCnpj.replace(/(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/,
-            function (regex, arg1, arg2, arg3, arg4, arg5) {
-                return arg1 + "." + arg2 + "." + arg3 + "/" + arg4 + "-" + arg5;
-            }
-
-        );
-
-        refCnpj.current.value = updateCnpj;
-    }, [cnpj]);
+        if (isCpf) {
+            setIdentityDocument(createMaskOf(
+                refIdentityDocument.current, /(\d{3})(\d{3})(\d{3})(\d{2})/, [".", ".", "-"]
+            ))
+        }
+        else {
+            setIdentityDocument(createMaskOf(
+                refIdentityDocument.current, /(\d{2})(\d{3})(\d{3})(\d{4})(\d{2})/, [".", ".", "/", "-"]
+            ))
+        }
+    }, [identityDocument]);
 
     return (
         <div className={candal.variable}>
@@ -55,17 +58,31 @@ export default function Cadastro() {
             {!isLogged &&
 
                 <form className={styles.form} onSubmit={(e) => login(e, setAlert)}>
-                    <label className={styles.lbl} htmlFor="cnpj">CNPJ</label>
-                    <input
-                        required
-                        className={`${styles.input} ${styles.cnpj}`}
-                        type="text"
-                        name="cnpj"
-                        pattern="\d{2}\.\d{3}\.\d{3}\/\d{4}-\d{2}"
-                        maxLength={18}
-                        ref={refCnpj}
-                        onChange={(e) => setCnpj(e.currentTarget.value)}
-                    />
+                    <label className={styles.lbl} htmlFor="identityDocument">{isCpf ? "CPF" : "CNPJ"}</label>
+                    <div style={{ display: "flex", alignItems: "center", padding: 0 }}>
+                        <input
+                            required
+                            className={`${styles.input} ${styles.identityDocument}`}
+                            type="text"
+                            name="identityDocument"
+                            pattern={isCpf ? "\\d{3}\\.\\d{3}\\.\\d{3}-\\d{2}" : "\\d{2}\\.\\d{3}\\.\\d{3}\\/\\d{4}-\\d{2}"}
+                            maxLength={isCpf ? 14 : 18}
+                            ref={refIdentityDocument}
+                            value={identityDocument}
+                            onChange={(e) => setIdentityDocument(e.currentTarget.value)}
+                        />
+                        <input
+                            type="checkbox"
+                            name="cpfCheckbox"
+                            className={styles.activeCpf}
+                            onChange={(e) => {
+                                setIdentityDocument(changeCpfCheckbox(
+                                    setIsCpf, e.currentTarget.checked, refIdentityDocument.current.value
+                                ));
+                            }}
+                        />
+                        <label htmlFor="cpfCheckbox" style={{ fontSize: 12 }} className={`${candal.className}`}>CPF</label>
+                    </div>
                     <label className={styles.lbl} htmlFor="password">Senha</label>
                     <input required className={styles.input} type="password" name="password" />
 
@@ -87,7 +104,7 @@ async function login(e, setAlert) {
     e.preventDefault();
 
     const data = {
-        identifier: e.target.cnpj.value,
+        identifier: e.target.identityDocument.value,
         password: e.target.password.value,
         type: "supplier"
     }
@@ -103,7 +120,11 @@ async function login(e, setAlert) {
         setAlert(error.err)
     }
     else {
-        const result = await res.json();
         redirect(`/comercial/fornecedor`);
     }
+}
+
+function changeCpfCheckbox(setIsCpf, isChecked, value) {
+    setIsCpf(isChecked);
+    return removeMask(value);
 }

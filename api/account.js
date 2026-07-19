@@ -44,7 +44,7 @@ app.post("/cadastro", connect,
             email: email,
             address: address,
             password: cryPassword,
-            [type === "client" ? "cpf" : "cnpj_cpf"]: identityDocument
+            cnpj_cpf: identityDocument
         }
 
         const newUser = createUser(type, data);
@@ -117,7 +117,7 @@ app.route("/:type/:username/edit").get(connect, async (req, res, next) => {
     }
 
     catch (err) {
-       next(err);
+        next(err);
     }
 })
     .post(connect, async (req, res) => {
