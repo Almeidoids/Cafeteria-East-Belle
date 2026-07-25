@@ -1,9 +1,6 @@
 "use client";
 
-import {
-    useRef, createRef, useEffect,
-    useState,
-} from "react";
+import { useRef, useEffect, useState,} from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 
@@ -25,8 +22,7 @@ import Alert from "./alert";
 // Util
 import createRefList from "../util/createRefList";
 
-export default function TableProducts({ products, setProducts, className, ref }) {
-    const [alert, setAlert] = useState(null);
+export default function TableProducts({ products, setProducts, onError, className, ref }) {
     const [search, setSearch] = useState("");
     const [listProducts, setListProducts] = useState([]);
     const [showModalExAll, setShowModalExAll] = useState(false);
@@ -112,7 +108,7 @@ export default function TableProducts({ products, setProducts, className, ref })
                                 key={i}
                                 index={i}
                                 setProducts={setProducts}
-                                setAlert={setAlert}
+                                onError={onError}
                             />
                         )
                     })}
@@ -153,31 +149,25 @@ export default function TableProducts({ products, setProducts, className, ref })
             </table>
 
             {showModalExAll &&
-                <ModalConfirm setShowModal={setShowModalExAll} onClick={() => { excludeAll(setAlert, setShowModalExAll, setProducts) }} >
+                <ModalConfirm setShowModal={setShowModalExAll} onClick={() => { excludeAll(onError, setShowModalExAll, setProducts) }} >
                     <span className={styles.textBody}>Deseja Excluir todos os produtos?</span>
                 </ModalConfirm>
             }
 
             {showModalSaveAll &&
-                <ModalConfirm setShowModal={setShowModalSaveAll} onClick={() => { editAll(setAlert, listEdit, router, setShowModalSaveAll) }} >
+                <ModalConfirm setShowModal={setShowModalSaveAll} onClick={() => { editAll(onError, listEdit, router, setShowModalSaveAll) }} >
                     <span className={styles.textBody}>Deseja Salvar todos os produtos?</span>
                 </ModalConfirm>
             }
 
-            <Alert alert={alert} setAlert={setAlert} style={{ display: alert ? "flex" : "none" }} />
         </div>
     )
 }
 
-function TableRow({ listEdit, setListEdit, setActionsOpen, products, setProducts, item, setAlert, index }, key) {
+function TableRow({ listEdit, setListEdit, setActionsOpen, products, setProducts, item, onError, index }, key) {
     const liRefsOptions = useRef([]);
     const [idEx, setIdEx] = useState(null);
     const promotion = (item.price * item.offer) / 100;
-
-
-    // useEffect(() => {
-    //     if (!listEdit[index]) listEdit[index] = {};
-    // }, []);
 
     useEffect(() => {
         createRefList(products.length, liRefsOptions.current);
@@ -275,7 +265,7 @@ function TableRow({ listEdit, setListEdit, setActionsOpen, products, setProducts
 
                                 <button
                                     className={`${styles.buttontd} ${styles.button}`}
-                                    onClick={() => saveOneItem(listEdit[index], setAlert, setProducts, setListEdit, index)}
+                                    onClick={() => saveOneItem(listEdit[index], onError, setProducts, setListEdit, index)}
                                 >
                                     <span>Salvar</span>
                                     <i className="bi bi-pen" />
@@ -288,7 +278,7 @@ function TableRow({ listEdit, setListEdit, setActionsOpen, products, setProducts
 
             {idEx &&
                 <td colSpan={0} style={{ textAlign: "left" }}>
-                    <ModalConfirm setShowModal={setIdEx} onClick={() => { excludeOne(setAlert, setIdEx, idEx, setProducts) }} >
+                    <ModalConfirm setShowModal={setIdEx} onClick={() => { excludeOne(onError, setIdEx, idEx, setProducts) }} >
                         <span className={styles.textBody}>Deseja Excluir este produto?</span>
                     </ModalConfirm>
                 </td>
@@ -302,12 +292,6 @@ function InputData({ val, itemkey, item, listEditValue, setListEdit }) {
     const [inputvalue, setInputValue] = useState(val);
     const inputWidth = typeof val === "string" ? val.length * 8 : val.toString().length * 8;
     const isEditable = ["name", "price", "quantity", "offer"];
-
-    useEffect(() => {
-        console.log(itemkey);
-        console.log(val);
-        console.log(item);
-    }, [])
 
     return (
         <td itemkey={val}>
@@ -345,7 +329,7 @@ function InputData({ val, itemkey, item, listEditValue, setListEdit }) {
     )
 }
 
-async function excludeAll(setAlert, setShowModalExAll, setProducts) {
+async function excludeAll(onError, setShowModalExAll, setProducts) {
     const res = await fetch(`/comercial/fornecedor/produto`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
@@ -354,18 +338,18 @@ async function excludeAll(setAlert, setShowModalExAll, setProducts) {
     if (!res.ok) {
         const result = await res.json();
 
-        setAlert(result.err);
+        onError(result.err);
     }
 
     else {
-        setAlert("Dados excluidos com sucesso");
+        onError("Dados excluidos com sucesso");
         setProducts([]);
     }
 
     setShowModalExAll(false);
 }
 
-async function excludeOne(setAlert, setIdEx, idEx, setProducts) {
+async function excludeOne(onError, setIdEx, idEx, setProducts) {
     const res = await fetch(`/comercial/fornecedor/produto/delete/${idEx}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
@@ -374,11 +358,11 @@ async function excludeOne(setAlert, setIdEx, idEx, setProducts) {
     if (!res.ok) {
         const result = await res.json();
 
-        setAlert(result.err);
+        onError(result.err);
     }
 
     else {
-        setAlert("Dado excluido com sucesso");
+        onError("Dado excluido com sucesso");
 
         setProducts((item) => {
             return item.filter((value) => value.id !== idEx)
@@ -415,7 +399,7 @@ function updateInputs(e, setInputValue) {
     return e.target.value;
 }
 
-async function saveOneItem(item, setAlert, setProducts, setListEdit, index) {
+async function saveOneItem(item, onError, setProducts, setListEdit, index) {
     const id = item._id;
     const formData = new FormData();
 
@@ -430,13 +414,13 @@ async function saveOneItem(item, setAlert, setProducts, setListEdit, index) {
 
     if (!res.ok) {
         const result = await res.json();
-        setAlert(result.err);
+        onError(result.err);
     }
 
     else {
         const keys = Object.keys(item);
 
-        setAlert("Item atualizado com sucesso!");
+        onError("Item atualizado com sucesso!");
 
         setProducts((value) => {
             return value.map((val, valIndex) => {
@@ -453,13 +437,12 @@ async function saveOneItem(item, setAlert, setProducts, setListEdit, index) {
 
         setListEdit(value => {
             value[index] = { _id: id };
-            console.log(value);
             return [...value]
         })
     }
 }
 
-async function editAll(setAlert, listEdit, router, setShowModalSaveAll) {
+async function editAll(onError, listEdit, router, setShowModalSaveAll) {
     listEdit = listEdit.filter(item => Object.keys(item).length !== 0);
 
     const res = await fetch(`/comercial/fornecedor/produto/editAll`, {
@@ -471,11 +454,11 @@ async function editAll(setAlert, listEdit, router, setShowModalSaveAll) {
     if (!res.ok) {
         const result = await res.json();
 
-        setAlert(result.err);
+        onError(result.err);
     }
 
     else {
-        setAlert("Dados Salvos com sucesso");
+        onError("Dados Salvos com sucesso");
         setShowModalSaveAll(false);
 
         setTimeout(() => {
@@ -487,12 +470,9 @@ async function editAll(setAlert, listEdit, router, setShowModalSaveAll) {
 }
 
 function setListEditDefault(listEdit, len) {
-    console.log(len);
     for (let i = 0; i < len; i++) {
         listEdit[i] = {};
     }
-
-    console.log(listEdit);
 
     return listEdit;
 }

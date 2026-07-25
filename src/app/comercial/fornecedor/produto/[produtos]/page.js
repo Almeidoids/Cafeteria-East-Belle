@@ -67,7 +67,6 @@ export default function Produtos({ params }) {
                 });
 
                 if (!res.ok) {
-                    console.log("erro");
                     return;
                 }
 
@@ -331,8 +330,7 @@ async function postForm(e, images, path, setAlert, bdData) {
 
         if (!res.ok) {
             const error = await res.json();
-            console.log(error);
-            setAlert(error.error);
+            setAlert(<div dangerouslySetInnerHTML={{ __html: error.err }} />);
         }
         else {
             redirect(`/comercial/fornecedor`);
@@ -343,7 +341,6 @@ async function postForm(e, images, path, setAlert, bdData) {
         const { data, bArr } = bdData;
         let change = true;
 
-        console.log(bdData);
 
         Object.entries(data).forEach(function ([key, value]) {
             if (items[key] === value) delete items[key];
@@ -390,7 +387,7 @@ async function postForm(e, images, path, setAlert, bdData) {
 
         if (!res.ok) {
             const error = await res.json();
-            setAlert(error.error);
+            setAlert(error.err);
         }
 
         else {

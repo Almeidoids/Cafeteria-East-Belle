@@ -3,7 +3,7 @@ const HTTPErrors = require("./util/HTTPErrors");
 const app = express.Router();
 
 module.exports = ((err, req, res, next) => {
-    console.log(err.message);
+    console.error(err.stack);
     if (err instanceof HTTPErrors) {
         return res.status(err.code).json({ err: err.message });
     }

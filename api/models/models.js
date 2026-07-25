@@ -8,6 +8,7 @@ const SupplierSchema = new Schema({
     cnpj_cpf: { type: String, unique: true, required: true, },
     address: { type: String, required: true, },
     password: { type: String, required: true, },
+    active: { type: Boolean, required: true, default: false },
 });
 
 const ProductsSchema = new Schema({
@@ -27,7 +28,8 @@ const ClientSchema = new Schema({
     email: { type: String, required: true },
     cpf: { type: String, unique: true, required: true },
     address: { type: String, required: true },
-    password: { type: String, required: true }
+    password: { type: String, required: true },
+    active: { type: Boolean, required: true, default: false },
 });
 
 const Supplier = mongoose.model("Fornecedores", SupplierSchema);

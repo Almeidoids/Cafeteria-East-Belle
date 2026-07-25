@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { redirect } from "next/navigation";
+import { ErrorBoundary } from "next/dist/client/components/error-boundary";
 
 //estilos
 import styles from "../../../../style/fornecedor.module.css"
@@ -17,6 +18,7 @@ import Authenticated from "../../../../components/authenticated";
 import TableProducts from "../../../../components/tableProducts";
 import BackBtn from "../../../../components/backBtn";
 import Dropdown from "../../../../components/dropdown";
+import Alert from "../../../../components/alert";
 
 // Util
 import { verifyLogin } from "../../../../util/authentication";
@@ -34,6 +36,7 @@ export default function Fornecedor({ }) {
     const [isLogged, setIsLogged] = useState(true);
     const [reqError, setReqError] = useState("");
     const [products, setProducts] = useState([]);
+    const [alert, setAlert] = useState(null);
 
     useEffect(() => {
         function animation() {
@@ -75,6 +78,12 @@ export default function Fornecedor({ }) {
 
             const { data } = await res.json();
 
+            if (data.active === false) {
+                setTimeout(() => setAlert(
+                    <span>Sua conta ainda não é verificada. Verifique-a <Link href = "/verificarConta">aqui</Link></span>
+                ), 1000);
+            }
+
             setSupplier(data.name);
             setProducts(data.products);
         }
@@ -109,6 +118,7 @@ export default function Fornecedor({ }) {
                 }
 
                 {isLogged &&
+
                     <div>
                         <div style={{ display: "none" }} ref={refDisappear}>
                             <h1 className={styles.title}>Bem vindo, {supplier}</h1>
@@ -136,13 +146,14 @@ export default function Fornecedor({ }) {
                                         </div>
                                     </div>
                                     <div style={{ display: !products[0] ? "none" : "block" }}>
-                                        <TableProducts products={products} setProducts={setProducts} />
+                                        <TableProducts products={products} setProducts={setProducts} onError = {(msg) => setAlert(msg)} />
                                     </div>
                                 </>
                             }
                         </div>
 
 
+                        <Alert alert={alert} setAlert={setAlert} style={{ display: alert ? "flex" : "none" }} />
                         <div className={styles.border1} ref={refBorder1} />
                         <div className={styles.border2} ref={refBorder2} />
                         <div className={styles.border3} ref={refBorder3} />

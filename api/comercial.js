@@ -29,6 +29,7 @@ app.get("/fornecedor/get/:fornecedor", connect,
             // Data é a váriavel que vai armazenar as informações do fornecedor que serão enviadas na resposta
             const data = {
                 name: supplier.name,
+                active: supplier.active,
                 products: products.map(item => {
                     return {
                         id: item._id,
@@ -61,6 +62,7 @@ app.route("/fornecedor/produto").post(upload.array("image", 4), connect,
 
         try {
             const supplier = await Supplier.findOne({ name: supplierName }).exec();
+            if (!supplier.active) throw new HTTPErrors("É necessário <a href = '/verificarConta'>verificar</a> sua conta para criar produtos", 403);
 
             const newProduct = new Products({
                 name: name,
