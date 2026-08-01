@@ -35,11 +35,15 @@ export default function EditSupplier({ }) {
             let fornecedor = "";
 
             try {
-                fornecedor = await verifyLogin(setIsLogged)
-                    .then(value => value.name);
+                fornecedor = await verifyLogin()
+                    .then(value => {
+                        setIsLogged(true);
+                        return value.name
+                    });
             }
             catch (err) {
                 setReqError(login.error);
+                setIsLogged(false);
                 setTimeout(() => redirect(`/comercial/cadastro`), 1000 * 2);
             }
 
@@ -149,19 +153,3 @@ function clear(setName, setEmail, setAddress) {
     setEmail("");
     setAddress([]);
 }
-
-// async function postForm(e, bdData, setAlert) {
-//     e.preventDefault();
-
-//     let [items, data] = setAccountItemsBy(e, bdData);
-//     items = deleteNotEdited(items, data);
-//     const res = await makeEditRequestBy(bdData.type, data.name, items);
-
-//     if (!res.ok) {
-//         const error = await res.json();
-//         setAlert(error.error);
-//     }
-//     else {
-//         redirect(`/comercial/fornecedor/${"name" in items ? items.name : data.name}`);
-//     }
-// }

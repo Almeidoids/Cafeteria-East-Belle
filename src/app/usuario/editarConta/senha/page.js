@@ -27,10 +27,14 @@ export default function EditarConta() {
     const [reqError, setReqError] = useState("");
 
     useEffect(() => {
-        verifyLogin(setIsLogged)
-            .then(value => setUsername(value.name))
+        verifyLogin()
+            .then(value => {
+                setIsLogged(true);
+                setUsername(value.name);
+            })
             .catch(err => {
                 setReqError(err.message);
+                setIsLogged(false);
                 setTimeout(() => redirect(`/`), 2000);
             });
     }, []);

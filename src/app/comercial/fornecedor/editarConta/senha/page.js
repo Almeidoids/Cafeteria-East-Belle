@@ -26,10 +26,14 @@ export default function EditarSenha({ }) {
     const [alert, setAlert] = useState(false);
 
     useEffect(() => {
-        verifyLogin(setIsLogged)
-            .then(value => setPath(value.name))
+        verifyLogin()
+            .then(value => {
+                setPath(value.name);
+                setIsLogged(true);
+            })
             .catch(() => {
                 setReqError(login.error);
+                setIsLogged(false);
                 setTimeout(() => redirect(`/comercial/cadastro`), 1000 * 10);
             })
     }, [])

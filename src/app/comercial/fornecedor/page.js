@@ -55,11 +55,15 @@ export default function Fornecedor({ }) {
             let fornecedor = "";
 
             try {
-                fornecedor = await verifyLogin(setIsLogged)
-                    .then(value => value.name);
+                fornecedor = await verifyLogin()
+                    .then(value => {
+                        setIsLogged(true);
+                        return value.name;
+                    });
             }
             catch (err) {
                 setReqError(login.error);
+                setIsLogged(false);
                 setTimeout(() => redirect(`/comercial/cadastro`), 1000 * 2);
             }
 
@@ -80,7 +84,7 @@ export default function Fornecedor({ }) {
 
             if (data.active === false) {
                 setTimeout(() => setAlert(
-                    <span>Sua conta ainda não é verificada. Verifique-a <Link href = "/verificarConta">aqui</Link></span>
+                    <span>Sua conta ainda não é verificada. Verifique-a <Link href="/verificarConta">aqui</Link></span>
                 ), 1000);
             }
 
@@ -146,7 +150,7 @@ export default function Fornecedor({ }) {
                                         </div>
                                     </div>
                                     <div style={{ display: !products[0] ? "none" : "block" }}>
-                                        <TableProducts products={products} setProducts={setProducts} onError = {(msg) => setAlert(msg)} />
+                                        <TableProducts products={products} setProducts={setProducts} onError={(msg) => setAlert(msg)} />
                                     </div>
                                 </>
                             }

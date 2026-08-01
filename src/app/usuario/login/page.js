@@ -24,9 +24,12 @@ export default function Cadastro() {
     const [isLogged, setIsLogged] = useState(false);
 
     useEffect(() => {
-        verifyLogin(setIsLogged)
-            .then(() => setTimeout(() => redirect("/"), 1000 * 2))
-            .catch();
+        verifyLogin()
+            .then(() => {
+                setTimeout(() => redirect("/"), 1000 * 2);
+                setIsLogged(true);
+            })
+            .catch(() => setIsLogged(false));
     }, [])
 
     return (
@@ -83,7 +86,7 @@ async function login(e, setAlert) {
     if (!res.ok) {
         const error = await res.json();
         console.log(error);
-        setAlert(error.error)
+        setAlert(error.err)
     }
 
     else {

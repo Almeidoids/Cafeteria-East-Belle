@@ -30,7 +30,6 @@ export default function Produtos() {
 
             if (!res.ok) {
                 const result = await res.json();
-                console.log(`Erro: ${result.err}`);
             }
 
             else {
@@ -55,8 +54,6 @@ export default function Produtos() {
                 const products = result.products.map((item) => {
                     const { image } = getImage(item.image);
                     const isMine = (id && id === item.supplierId);
-                    console.log(isMine);
-                    console.log(id);
                     item.image = image;
 
                     return (
@@ -76,15 +73,15 @@ export default function Produtos() {
             }
         }
 
-        verifyLogin(setIsLogged)
+        verifyLogin()
             .then(async function (value) {
                 if (value.type === "supplier") {
                     const supplierId = await getSupplier(value);
                     getProducts(supplierId);
+                    setIsLogged(true);
                 }
             })
-            .catch();
-
+            .catch(() => setIsLogged(false));
     }, [])
 
     useEffect(() => {

@@ -22,11 +22,12 @@ export default function Menu({ ref, style }) {
     const [user, setUser] = useState("");
 
     useEffect(() => {
-        verifyLogin(setIsLogged)
+        verifyLogin()
             .then(value => {
                 if (value) setUser(value)
+                setIsLogged(true);
             })
-            .catch();
+            .catch((err) => setIsLogged(false));
     }, [])
 
     return (

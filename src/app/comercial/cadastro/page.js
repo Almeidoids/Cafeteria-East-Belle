@@ -28,9 +28,12 @@ export default function Cadastro() {
     const [isCpf, setIsCpf] = useState(false);
 
     useEffect(() => {
-        verifyLogin(setIsLogged)
-            .then(() => setTimeout(() => redirect(`/comercial/fornecedor/`), 1000 * 2))
-            .catch();
+        verifyLogin()
+            .then(() => {
+                setTimeout(() => redirect(`/comercial/fornecedor/`), 1000 * 2);
+                setIsLogged(true);
+            })
+            .catch((err) => setIsLogged(false));
     }, [])
 
     useEffect(() => {

@@ -34,11 +34,15 @@ export default function EditarConta() {
             let user = "";
 
             try {
-                user = await verifyLogin(setIsLogged)
-                .then((value) => value.name);
+                user = await verifyLogin()
+                    .then((value) => {
+                        setIsLogged(true);
+                        value.name;
+                    });
             }
             catch (err) {
                 setReqError(err.message);
+                setIsLogged(false);
                 setTimeout(() => redirect(`/`), 2000);
             }
 

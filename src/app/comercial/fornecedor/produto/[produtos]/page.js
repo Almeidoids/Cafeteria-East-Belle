@@ -50,11 +50,15 @@ export default function Produtos({ params }) {
             const { produtos } = await params;
             let name;
             try {
-                name = await verifyLogin(setIsLogged)
-                    .then(value => value.name);
+                name = await verifyLogin()
+                    .then(value => {
+                        setIsLogged(true);
+                        return value.name;
+                    });
             }
             catch (err) {
                 setReqError(err.message);
+                setIsLogged(false);
                 setTimeout(() => redirect(`/comercial/cadastro`), 1000 * 2);
             }
 
