@@ -2,8 +2,8 @@ const jwt = require("jsonwebtoken");
 
 // Adiciona o refreshToken e o AcessToken a cookies
 function setCookie(res, refresh, acess) {
-    const expiresR = 60 * 60 * 24 * 3; // Tempo para o cookie do Refreshtoken expirar
-    const expiresA = 60 * 30; // Tempo para o cookie do Acesstoken expirar
+    const expiresRefreshtoken = 60 * 60 * 24 * 3; // Tempo para o cookie do Refreshtoken expirar
+    const expiresAcessToken = 60 * 30; // Tempo para o cookie do Acesstoken expirar
 
     // Define cada cookie, com propriedades seguras, para o front-end não ser capaz de acessá-los
     res.setHeader("Set-Cookie",
@@ -12,14 +12,14 @@ function setCookie(res, refresh, acess) {
             "HttpOnly; " +
             "Secure; " +
             "SameSite=strict; " +
-            `Max-Age=${expiresR};` +
+            `Max-Age=${expiresRefreshtoken};` +
             "path=/",
 
             `acessToken=${acess}; ` +
             "HttpOnly; " +
             "Secure; " +
             "SameSite=strict; " +
-            `Max-Age=${expiresA};` +
+            `Max-Age=${expiresAcessToken};` +
             "path=/",
         ]
     )
@@ -45,10 +45,8 @@ function getCookie(req) {
 function setTkn(req, res) {
     const { name } = req.body; // Pega o nome de usuario do body
     const type = req.type;
-    console.log(type);
     const data = {};
     data[`${type}`] = name;
-    console.log(name);
 
     const acessToken = jwt.sign({ name, type }, process.env.secretKey, { expiresIn: "30m" }); // Armazena o nome no AcessToken, que expirará em 30 minutos 
     const refreshToken = jwt.sign({ name, type }, process.env.secretKey, { expiresIn: "3d" }); // Armazena o nome no RefreshToken, que será usado para revalidar o AcessToken quando a sessão expirar. Expirará em 3 dias
@@ -60,7 +58,7 @@ function setTkn(req, res) {
 
 // Função para revalidar o acess token
 function refreshTkn(refreshToken, res) {
-    let naTkn = null;
+    let resultTkn = null;
 
     //  Verifica o refreshToken e faz uma função para caso seja validado ou dê erro
     jwt.verify(refreshToken, process.env.secretKey, function (err, user) {
@@ -73,10 +71,10 @@ function refreshTkn(refreshToken, res) {
 
         setCookie(res, newRefreshToken, newAcessToken); // coloca os dois no cookie
 
-        naTkn = newAcessToken; // Retorna o novo Token de acesso
+        resultTkn = newAcessToken; // Retorna o novo Token de acesso
     })
 
-    return naTkn;
+    return resultTkn;
 }
 
 function getTkn(req, res, next) {
@@ -96,7 +94,6 @@ function getTkn(req, res, next) {
         if (err) return res.status(403).json({ error: "Acesso NÃO autorizado" }); // Se der erro, retorna resposta
         
         req.user = user; // define req.user como o valor armazenado no jwt (user)
-        console.log(user);
         next(); // Chama a próxima função da requisição
     })
 }

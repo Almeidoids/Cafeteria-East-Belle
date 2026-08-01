@@ -1,6 +1,7 @@
 const express = require("express");
 const app = express.Router();
 const bcrypt = require("bcrypt");
+const nodemailer = require("nodemailer");
 
 // UTIL
 const connect = require("./util/connect");
@@ -64,11 +65,11 @@ app.post("/cadastro", connect,
 
 app.post("/login", connect,
     async function (req, res, next) {
-        const { identifier, password, type } = req.body;
+        const { identityDocument, password, type } = req.body;
         req.type = type;
 
         try {
-            const user = await getUser(identifier, type, res);
+            const user = await getUser(identityDocument, type, res);
 
             if (!user) {
                 throw new HTTPErrors("Usuario não encontrado", 404);
@@ -124,17 +125,19 @@ app.route("/:type/:username/edit").get(connect, async (req, res, next) => {
         const items = req.body;
         const { username, type } = req.params;
 
-        if ("name" in items) {
-            req.type = type;
-            setTkn(req, res);
-        }
-
         try {
+            let user = null;
+
             if (type === "client") {
-                await Client.findOneAndUpdate({ name: username }, { $set: items });
+                user = await Client.findOneAndUpdate({ name: username }, { $set: items });
             }
             if (type === "supplier") {
-                await Supplier.findOneAndUpdate({ name: username }, { $set: items });
+                user = await Supplier.findOneAndUpdate({ name: username }, { $set: items });
+            }
+            
+            if ("name" in items) {
+                req.type = type;
+                setTkn(req, res);
             }
 
             res.send("Sucesso");
@@ -144,7 +147,7 @@ app.route("/:type/:username/edit").get(connect, async (req, res, next) => {
             next(err);
         }
     }
-    )
+)
 
 app.post("/:type/:username/edit/senha", connect, async (req, res, next) => {
     const { oldPassword, newPassword } = req.body;
@@ -182,6 +185,29 @@ app.post("/:type/:username/edit/senha", connect, async (req, res, next) => {
     }
 })
 
+app.post("/sendVerifyEmail", getTkn, async (req, res) => {
+    const type = req.user.type;
+    try {
+        if (type === "supplier") {
+            user = await Supplier.findOne({ name: username }).exec();
+            req.identityDocument = user.cnpj_cpf;
+        }
+        if (type === "client") {
+            user = await Client.findOne({ name: username }).exec();
+            req.identityDocument = user.cpf;
+        }
+
+        if (!user) throw new HTTPErrors("Usuario não encontrado", 404);
+
+        next();
+    }
+    catch (err) {
+        next(err);
+    }
+}, setVerifyAccountTkn,
+function(req, res) {
+
+})
 
 app.get("/exit", (req, res) => {
     res.clearCookie("acessToken", { path: "/" });

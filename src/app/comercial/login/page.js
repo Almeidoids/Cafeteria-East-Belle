@@ -107,7 +107,7 @@ async function login(e, setAlert) {
     e.preventDefault();
 
     const data = {
-        identifier: e.target.identityDocument.value,
+        identityDocument: e.target.identityDocument.value,
         password: e.target.password.value,
         type: "supplier"
     }

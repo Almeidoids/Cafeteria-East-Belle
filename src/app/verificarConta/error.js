@@ -17,7 +17,7 @@ export default function VerificarConta({ error }) {
 
             <div style={{ display: "flex", alignItems: "center", height: "90vh" }}>
                 <h2 style={{ textAlign: "center", width: "100%" }}>Algo deu errado, verifique o console para mais informaçṍes.</h2>
-                <h5 style={{ textAlign: "center", width: "100%", marginTop: 15 }} >Recarregue a página para mais informações</h5>
+                <h5 style={{ textAlign: "center", width: "100%", marginTop: 15 }} >Em alguns minutos. Recarregue a página e tente novamente.</h5>
             </div>
 
             <Rodape />

@@ -24,31 +24,31 @@ function identifyError(err) {
     }
 }
 
-async function login(req, res, next, type) {
-    const { identifier, password } = req.body;
-    req.type = type;
+// async function login(req, res, next, type) {
+//     const { identifier, password } = req.body;
+//     req.type = type;
 
-    try {
-        const user = await getUser(identifier, type, res);
+//     try {
+//         const user = await getUser(identifier, type, res);
 
-        if (!user) {
-            res.status(404).json({ error: "Usuario não encontrado" });
-            return;
-        }
+//         if (!user) {
+//             res.status(404).json({ error: "Usuario não encontrado" });
+//             return;
+//         }
 
-        const cryPassword = user.password;
-        const uncryPassword = await bcrypt.compare(password, cryPassword);
+//         const cryPassword = user.password;
+//         const uncryPassword = await bcrypt.compare(password, cryPassword);
 
-        req.body.name = user.name;
+//         req.body.name = user.name;
 
-        uncryPassword ? next() :
-            res.status(401).json({ error: "Senha incorreta" });
-    }
-    catch (err) {
-        console.log(err);
-        res.status(500).json({ error: "Erro ao logar" });
-    }
-}
+//         uncryPassword ? next() :
+//             res.status(401).json({ error: "Senha incorreta" });
+//     }
+//     catch (err) {
+//         console.log(err);
+//         res.status(500).json({ error: "Erro ao logar" });
+//     }
+// }
 
 async function getUser(identifier, type) {
     let user = null;
