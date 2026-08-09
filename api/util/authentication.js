@@ -1,29 +1,42 @@
 const jwt = require("jsonwebtoken");
 
-// Adiciona o refreshToken e o AcessToken a cookies
-function setCookie(res, refresh, acess) {
-    const expiresRefreshtoken = 60 * 60 * 24 * 3; // Tempo para o cookie do Refreshtoken expirar
-    const expiresAcessToken = 60 * 30; // Tempo para o cookie do Acesstoken expirar
+function setCookie(res, tkn, timeInMinutes) {
+    // const expiresRefreshtoken = 60 * 60 * 24 * 3; // Tempo para o cookie do Refreshtoken expirar
+    // const expiresAcessToken = 60 * 30; // Tempo para o cookie do Acesstoken expirar
 
     // Define cada cookie, com propriedades seguras, para o front-end não ser capaz de acessá-los
-    res.setHeader("Set-Cookie",
-        [
-            `refreshToken=${refresh}; ` +
-            "HttpOnly; " +
-            "Secure; " +
-            "SameSite=strict; " +
-            `Max-Age=${expiresRefreshtoken};` +
-            "path=/",
-
-            `acessToken=${acess}; ` +
-            "HttpOnly; " +
-            "Secure; " +
-            "SameSite=strict; " +
-            `Max-Age=${expiresAcessToken};` +
-            "path=/",
-        ]
-    )
+    res.cookie(tkn.label, tkn.value, {
+        httpOnly: true,
+        secure: true,
+        sameSite: "strict",
+        maxAge: timeInMinutes,
+        path: "/"
+    });
 }
+
+// // Adiciona o refreshToken e o AcessToken a cookies
+// function setCookie(res, refresh, acess) {
+//     const expiresRefreshtoken = 60 * 60 * 24 * 3; // Tempo para o cookie do Refreshtoken expirar
+//     const expiresAcessToken = 60 * 30; // Tempo para o cookie do Acesstoken expirar
+//
+//     // Define cada cookie, com propriedades seguras, para o front-end não ser capaz de acessá-los
+//     res.setHeader("Set-Cookie",
+//         [
+//             `refreshToken=${refresh}; ` +
+//             "HttpOnly; " +
+//             "Secure; " +
+//             "SameSite=strict; " +
+//             `Max-Age=${expiresRefreshtoken};` +
+//             "path=/",
+//
+//             `acessToken=${acess}; ` +
+//             "HttpOnly; " +
+//             "Secure; " +
+//             "SameSite=strict; " +
+//             `Max-Age=${expiresAcessToken};` +
+//             "path=/",
+//         ]
+
 
 // Função para pegar os cookies
 function getCookie(req) {
@@ -51,7 +64,9 @@ function setTkn(req, res) {
     const acessToken = jwt.sign({ name, type }, process.env.secretKey, { expiresIn: "30m" }); // Armazena o nome no AcessToken, que expirará em 30 minutos 
     const refreshToken = jwt.sign({ name, type }, process.env.secretKey, { expiresIn: "3d" }); // Armazena o nome no RefreshToken, que será usado para revalidar o AcessToken quando a sessão expirar. Expirará em 3 dias
 
-    setCookie(res, refreshToken, acessToken); // Chama a função setCookie
+    // setCookie(res, refreshToken, acessToken); // Chama a função setCookie
+    setCookie(res, { label: "refreshToken", value: refreshToken }, 1000 * 60 * 15);
+
 
     res.json(data); // entrega o nome do fornecedor como resposta da requisição
 }
@@ -92,7 +107,7 @@ function getTkn(req, res, next) {
     // Verifica o acessToken, e faz uma função para caso seja validado ou dê erro
     jwt.verify(acessToken, process.env.secretKey, function (err, user) {
         if (err) return res.status(403).json({ error: "Acesso NÃO autorizado" }); // Se der erro, retorna resposta
-        
+
         req.user = user; // define req.user como o valor armazenado no jwt (user)
         next(); // Chama a próxima função da requisição
     })
