@@ -1,10 +1,29 @@
 const jwt = require("jsonwebtoken");
+const HTTPErrors = require("./HTTPErrors");
+
+function setTkn(req, res) {
+    const { name } = req.body;
+    const type = req.type;
+    const data = {[`${type}`] : name};
+
+    const acessToken = jwt.sign({ name, type }, process.env.secretKey, { expiresIn: "30m" });
+    const refreshToken = jwt.sign({ name, type }, process.env.secretKey, { expiresIn: "3d" });
+
+    setTknCookies(res, acessToken, refreshToken);
+    res.json(data);
+}
+
+function setTknCookies(res, acessToken, refreshToken) {
+    const fifteenMinutes = 1000 * 60 * 15;
+    const threeDays = 1000 * 60 * 60 * 24 * 3;
+
+    setCookie(res, { label: "acessToken", value: acessToken }, fifteenMinutes);
+    setCookie(res, { label: "refreshToken", value: refreshToken }, threeDays);
+}
+
 
 function setCookie(res, tkn, timeInMinutes) {
-    // const expiresRefreshtoken = 60 * 60 * 24 * 3; // Tempo para o cookie do Refreshtoken expirar
-    // const expiresAcessToken = 60 * 30; // Tempo para o cookie do Acesstoken expirar
-
-    // Define cada cookie, com propriedades seguras, para o front-end não ser capaz de acessá-los
+    // Define o cookie, com propriedades seguras, para o front-end não ser capaz de acessá-los
     res.cookie(tkn.label, tkn.value, {
         httpOnly: true,
         secure: true,
@@ -12,6 +31,64 @@ function setCookie(res, tkn, timeInMinutes) {
         maxAge: timeInMinutes,
         path: "/"
     });
+}
+
+function getTkn(req, res) {
+    const cookies = getCookie(req);
+
+    const { refreshToken } = cookies;
+    let { acessToken } = cookies;
+
+    if (!acessToken && refreshToken) {
+        acessToken = refreshTkn(refreshToken, res);
+    }
+
+    let returnTkn = "";
+    jwt.verify(acessToken, process.env.secretKey, function (err, user) {
+        if (err) {
+            throw new HTTPErrors("Acesso NÃO autorizado", 403);
+            // return res.status(403).json({ error: "Acesso NÃO autorizado" })
+        };
+
+        returnTkn = user;
+    })
+
+    return returnTkn;
+}
+
+// Função para pegar os cookies
+function getCookie(req) {
+    const cookiesOriginal = req.headers.cookie;
+    const cookies = {};
+
+    if (!cookiesOriginal) throw new HTTPErrors("Faça login em sua conta primeiro", 401);
+
+    cookiesOriginal.split(";").forEach(function (item) {
+        const [key, value] = item.trim().split("=");
+        cookies[key] = value;
+    })
+
+    return cookies;
+}
+
+function refreshTkn(refreshToken, res) {
+    let resultTkn = null;
+
+    jwt.verify(refreshToken, process.env.secretKey, function (err, user) {
+        if (err) {
+            throw new HTTPErrors("Sua sessão expirou", 403);
+            // res.status(403).json({ error: "Sua sessão expirou" }); // Manda um aviso caso dê erro
+        }
+
+        const newAcessToken = jwt.sign({ name: user.name, type: user.type }, process.env.secretKey, { expiresIn: "30m" });
+        const newRefreshToken = jwt.sign({ name: user.name, type: user.type }, process.env.secretKey, { expiresIn: "3d" });
+
+        setTknCookies(res, newAcessToken, newRefreshToken);
+
+        resultTkn = newAcessToken;
+    })
+
+    return resultTkn;
 }
 
 // // Adiciona o refreshToken e o AcessToken a cookies
@@ -37,80 +114,4 @@ function setCookie(res, tkn, timeInMinutes) {
 //             "path=/",
 //         ]
 
-
-// Função para pegar os cookies
-function getCookie(req) {
-    const cookiesOriginal = req.headers.cookie; // Pega a string dos cookies do headers 
-    const cookies = {}; // Objeto onde os cookies serão armazenados
-
-    if (!cookiesOriginal) return null; // Se os cookies não existirem, retorna null
-
-    // Transforma a string dos cookies em um objeto
-    cookiesOriginal.split(";").forEach(function (item) { // Divide a string em um array e depois faz um forEach com todos os valores 
-        const [key, value] = item.trim().split("="); // Armazena os pares chave e valor do cookie em duas variaveis: key e value
-        cookies[key] = value;
-    })
-
-    return cookies; // Retorna o objeto
-}
-
-// Função para gerar o Token
-function setTkn(req, res) {
-    const { name } = req.body; // Pega o nome de usuario do body
-    const type = req.type;
-    const data = {};
-    data[`${type}`] = name;
-
-    const acessToken = jwt.sign({ name, type }, process.env.secretKey, { expiresIn: "30m" }); // Armazena o nome no AcessToken, que expirará em 30 minutos 
-    const refreshToken = jwt.sign({ name, type }, process.env.secretKey, { expiresIn: "3d" }); // Armazena o nome no RefreshToken, que será usado para revalidar o AcessToken quando a sessão expirar. Expirará em 3 dias
-
-    // setCookie(res, refreshToken, acessToken); // Chama a função setCookie
-    setCookie(res, { label: "refreshToken", value: refreshToken }, 1000 * 60 * 15);
-
-
-    res.json(data); // entrega o nome do fornecedor como resposta da requisição
-}
-
-// Função para revalidar o acess token
-function refreshTkn(refreshToken, res) {
-    let resultTkn = null;
-
-    //  Verifica o refreshToken e faz uma função para caso seja validado ou dê erro
-    jwt.verify(refreshToken, process.env.secretKey, function (err, user) {
-        if (err) {
-            res.status(403).json({ error: "Sua sessão expirou" }); // Manda um aviso caso dê erro
-        }
-
-        const newAcessToken = jwt.sign({ name: user.name, type: user.type }, process.env.secretKey, { expiresIn: "30m" }); // Define um novo Token de acesso
-        const newRefreshToken = jwt.sign({ name: user.name, type: user.type }, process.env.secretKey, { expiresIn: "3d" }); // Define um novo Token para recarregar
-
-        setCookie(res, newRefreshToken, newAcessToken); // coloca os dois no cookie
-
-        resultTkn = newAcessToken; // Retorna o novo Token de acesso
-    })
-
-    return resultTkn;
-}
-
-function getTkn(req, res, next) {
-
-    const cookies = getCookie(req); // Pega os cookie pela função getCookie
-
-    if (!cookies) res.status(401).json({ error: "Faça login em sua conta primeiro" }); // Se cookies for nulo, dá erro    
-
-    // Pega tanto refreshToken quanto o acessToken dos cookies
-    const { refreshToken } = cookies;
-    let { acessToken } = cookies;
-
-    if (!acessToken && refreshToken) acessToken = refreshTkn(refreshToken, res); // Verifica se o token é válido, se não for, chama a função refreshToken para revalidar o acesssToken
-
-    // Verifica o acessToken, e faz uma função para caso seja validado ou dê erro
-    jwt.verify(acessToken, process.env.secretKey, function (err, user) {
-        if (err) return res.status(403).json({ error: "Acesso NÃO autorizado" }); // Se der erro, retorna resposta
-
-        req.user = user; // define req.user como o valor armazenado no jwt (user)
-        next(); // Chama a próxima função da requisição
-    })
-}
-
-module.exports = { setTkn, refreshTkn, getTkn };
+module.exports = { setTkn, getTkn };

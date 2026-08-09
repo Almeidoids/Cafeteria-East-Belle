@@ -7,14 +7,20 @@ const nodemailer = require("nodemailer");
 const connect = require("./util/connect");
 const { getTkn, setTkn } = require("./util/authentication");
 const { Supplier, Client } = require("./models/models");
-const { createUser, identifyError, getUser } = require("./util/loginOrSign");
+const { createUser, ChangeErrToHttpErrorIfIsUserDuplicated, getUser, adjustUserDataBeforeSave, updateOneUser } = require("./util/loginOrSign");
 const HTTPErrors = require("./util/HTTPErrors");
 
 app.use(express.json());
 
-app.get("/", getTkn, (req, res) => {
-    const user = req.user;
-    res.json({ user });
+app.get("/", (req, res, next) => {
+    try {
+        req.user = getTkn(req, res);
+        const user = req.user;
+        res.json({ user });
+    }
+    catch (err) {
+        next(err);
+    }
 })
 
 app.get("/supplier/:supplier", connect, async (req, res) => {
@@ -24,66 +30,48 @@ app.get("/supplier/:supplier", connect, async (req, res) => {
         const dbSupplier = await Supplier.findOne({ name: supplier }).exec();
 
         if (!dbSupplier) throw new HTTPErrors("Fornecedor não encontrado", 404);
-
         else res.json({ id: dbSupplier._id });
     }
 
     catch (err) {
-        res.status(500).json({ err: "Erro ao capturar informaçẽos de conta" });
+        next(err);
     }
 })
 
 app.post("/cadastro", connect,
 
     async function (req, res, next) {
-        let { name, address, password, email, identityDocument, type } = await req.body;
-        req.type = type;
-
-        const cryPassword = await bcrypt.hash(password, 10);
-        const data = {
-            name: name,
-            email: email,
-            address: address,
-            password: cryPassword,
-            cnpj_cpf: identityDocument
-        }
-
+        const data = await adjustUserDataBeforeSave(req);
+        const type = req.body.type;
         const newUser = createUser(type, data);
 
         try {
             await newUser.save()
+            req.body.type = type;
             next();
         }
-
         catch (err) {
-            const { code, message } = identifyError(err);
-            res.status(code).json(message);
+            err = ChangeErrToHttpErrorIfIsUserDuplicated(err);
+            next(err);
         }
     },
-    setTkn
+    setTkn,
 );
 
 app.post("/login", connect,
     async function (req, res, next) {
         const { identityDocument, password, type } = req.body;
-        req.type = type;
-
         try {
-            const user = await getUser(identityDocument, type, res);
-
-            if (!user) {
-                throw new HTTPErrors("Usuario não encontrado", 404);
-            }
-
+            const user = await getUser(identityDocument, type);
             const cryPassword = user.password;
             const uncryPassword = await bcrypt.compare(password, cryPassword);
-
-            req.body.name = user.name;
-
+            
             if (!uncryPassword) {
                 throw new HTTPErrors("Senha incorreta", 401);
             }
 
+            req.body.name = user.name;
+            req.type = type;
             next()
         }
         catch (err) {
@@ -95,17 +83,16 @@ app.post("/login", connect,
 
 app.route("/:type/:username/edit").get(connect, async (req, res, next) => {
     const { username, type } = req.params;
-    let user = null;
 
     try {
-        if (type === "client") {
-            user = await Client.findOne({ name: username }).exec();
-        }
-        if (type === "supplier") {
-            user = await Supplier.findOne({ name: username }).exec();
-        }
-
-        if (!user) throw new HTTPErrors("Usuario não encontrado", 404);
+        const search = "name";
+        const user = await getUser(username, type, {search});
+        // if (type === "client") {
+        //     user = await Client.findOne({ name: username }).exec();
+        // }
+        // if (type === "supplier") {
+        //     user = await Supplier.findOne({ name: username }).exec();
+        // }
 
         const data = {
             id: user._id,
@@ -126,14 +113,13 @@ app.route("/:type/:username/edit").get(connect, async (req, res, next) => {
         const { username, type } = req.params;
 
         try {
-            let user = null;
-
-            if (type === "client") {
-                user = await Client.findOneAndUpdate({ name: username }, { $set: items });
-            }
-            if (type === "supplier") {
-                user = await Supplier.findOneAndUpdate({ name: username }, { $set: items });
-            }
+            updateOneUser(items, type, {key: "name", value: username});
+            // if (type === "client") {
+            //     user = await Client.findOneAndUpdate({ name: username }, { $set: items });
+            // }
+            // if (type === "supplier") {
+            //     user = await Supplier.findOneAndUpdate({ name: username }, { $set: items });
+            // }
             
             if ("name" in items) {
                 req.type = type;
@@ -185,9 +171,11 @@ app.post("/:type/:username/edit/senha", connect, async (req, res, next) => {
     }
 })
 
-app.post("/sendVerifyEmail", getTkn, async (req, res) => {
-    const type = req.user.type;
+app.post("/sendVerifyEmail", async (req, res, next) => {
     try {
+        req.user = getTkn(req, res);
+        const type = req.user.type;
+
         if (type === "supplier") {
             user = await Supplier.findOne({ name: username }).exec();
             req.identityDocument = user.cnpj_cpf;

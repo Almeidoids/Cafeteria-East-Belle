@@ -1,67 +1,64 @@
 const { Client, Supplier } = require("../models/models");
 const bcrypt = require("bcrypt");
+const HTTPErrors = require("./HTTPErrors");
+
+const user = Object.freeze({
+    client: {model: Client, search: "email"},
+    supplier: {model: Supplier, search: "cnpj_cpf"}
+});
+
+async function adjustUserDataBeforeSave(req) {
+    let { name, address, password, email, identityDocument } = req.body;        
+    const cryPassword = await bcrypt.hash(password, 10);
+    
+    return {
+        name: name, 
+        email: email, 
+        address: address,
+        password: cryPassword, 
+        cnpj_cpf: identityDocument 
+    }
+}
 
 function createUser(type, data) {
-    let user;
-    if (type === "client") {
-        user = new Client(data);
-    }
-    if (type === "supplier") {
-        user = new Supplier(data);
-    }
-
-    return user
+    return new user[type].model(data);
 }
 
-function identifyError(err) {
+function ChangeErrToHttpErrorIfIsUserDuplicated(err) {
     if (err.code === 11000) {
-        return { code: 400, message: "Este usuário já existe" }
+        return new HTTPErrors("Este usuário já existe", 400);
+        // return { code: 400, message: "Este usuário já existe" }
     }
 
-    else {
-        console.log(err.message);
-        return { code: 500, message: "Erro ao cadastrar usuário" }
+    return err;
+}
+
+async function getUser(identifier, type, { search } = user[type]) {
+    const {model} = user[type];
+    const returnUser = await model.findOne({[`${search}`]: identifier}).exec();
+    throwErrorIfNotFinded(returnUser);
+    
+    return returnUser;
+}
+
+function throwErrorIfNotFinded(target) {
+    if (!target) {
+        throw new HTTPErrors("Usuario não encontrado", 404);
     }
 }
 
-// async function login(req, res, next, type) {
-//     const { identifier, password } = req.body;
-//     req.type = type;
+async function updateOneUser(items, type, search) {
+    const {model} = user[type];
+    const returnUser = await model.findOneAndUpdate({ [`${search.key}`]: search.value }, { $set: items })
+    throwErrorIfNotFinded(returnUser);
 
-//     try {
-//         const user = await getUser(identifier, type, res);
-
-//         if (!user) {
-//             res.status(404).json({ error: "Usuario não encontrado" });
-//             return;
-//         }
-
-//         const cryPassword = user.password;
-//         const uncryPassword = await bcrypt.compare(password, cryPassword);
-
-//         req.body.name = user.name;
-
-//         uncryPassword ? next() :
-//             res.status(401).json({ error: "Senha incorreta" });
-//     }
-//     catch (err) {
-//         console.log(err);
-//         res.status(500).json({ error: "Erro ao logar" });
-//     }
-// }
-
-async function getUser(identifier, type) {
-    let user = null;
-
-    if (type === "client") {
-        user = await Client.findOne({ email: identifier }).exec();
-    }
-
-    if (type === "supplier") {
-        user = await Supplier.findOne({ cnpj_cpf: identifier }).exec();
-    }
-
-    return user;
+    return returnUser;
 }
 
-module.exports = { login, createUser, identifyError, getUser };
+module.exports = { 
+    adjustUserDataBeforeSave, 
+    createUser, 
+    ChangeErrToHttpErrorIfIsUserDuplicated, 
+    getUser,
+    updateOneUser
+};
