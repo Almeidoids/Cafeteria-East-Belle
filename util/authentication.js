@@ -16,6 +16,6 @@ export async function logged() {
 
 export async function verifyLogin() {
     const login = await logged();
-    if ("error" in login) throw new Error(login.error);
+    if ("err" in login) throw new Error(login.error);
     else return login;
 }

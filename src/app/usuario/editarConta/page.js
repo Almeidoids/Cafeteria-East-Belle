@@ -37,7 +37,7 @@ export default function EditarConta() {
                 user = await verifyLogin()
                     .then((value) => {
                         setIsLogged(true);
-                        value.name;
+                        return value.name;
                     });
             }
             catch (err) {

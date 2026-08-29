@@ -3,20 +3,20 @@ const bcrypt = require("bcrypt");
 const HTTPErrors = require("./HTTPErrors");
 
 const user = Object.freeze({
-    client: {model: Client, search: "email"},
-    supplier: {model: Supplier, search: "cnpj_cpf"}
+    client: { model: Client, search: "email" },
+    supplier: { model: Supplier, search: "cnpj_cpf" }
 });
 
 async function adjustUserDataBeforeSave(req) {
-    let { name, address, password, email, identityDocument } = req.body;        
+    let { name, address, password, email, identityDocument } = req.body;
     const cryPassword = await bcrypt.hash(password, 10);
-    
+
     return {
-        name: name, 
-        email: email, 
+        name: name,
+        email: email,
         address: address,
-        password: cryPassword, 
-        cnpj_cpf: identityDocument 
+        password: cryPassword,
+        [req.body.type === "client" ? "cpf" : "cnpj_cpf"]: identityDocument
     }
 }
 
@@ -34,10 +34,13 @@ function ChangeErrToHttpErrorIfIsUserDuplicated(err) {
 }
 
 async function getUser(identifier, type, { search } = user[type]) {
-    const {model} = user[type];
-    const returnUser = await model.findOne({[`${search}`]: identifier}).exec();
+    const { model } = user[type];
+    console.log(search);
+    console.log(identifier);
+    const returnUser = await model.findOne({ [`${search}`]: identifier }).exec();
+    console.log(returnUser);
     throwErrorIfNotFinded(returnUser);
-    
+
     return returnUser;
 }
 
@@ -48,17 +51,17 @@ function throwErrorIfNotFinded(target) {
 }
 
 async function updateOneUser(items, type, search) {
-    const {model} = user[type];
+    const { model } = user[type];
     const returnUser = await model.findOneAndUpdate({ [`${search.key}`]: search.value }, { $set: items })
     throwErrorIfNotFinded(returnUser);
 
     return returnUser;
 }
 
-module.exports = { 
-    adjustUserDataBeforeSave, 
-    createUser, 
-    ChangeErrToHttpErrorIfIsUserDuplicated, 
+module.exports = {
+    adjustUserDataBeforeSave,
+    createUser,
+    ChangeErrToHttpErrorIfIsUserDuplicated,
     getUser,
     updateOneUser
 };

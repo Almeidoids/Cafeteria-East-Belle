@@ -2,7 +2,6 @@
 
 import Link from "next/link"
 import { useState, useEffect } from "react";
-import { redirect } from "next/navigation";
 
 //Estilos
 import "bootstrap-icons/font/bootstrap-icons.css";
@@ -27,7 +26,10 @@ export default function Menu({ ref, style }) {
                 if (value) setUser(value)
                 setIsLogged(true);
             })
-            .catch((err) => setIsLogged(false));
+            .catch(() => {
+                setIsLogged(false)
+                console.log("teste");
+            });
     }, [])
 
     return (

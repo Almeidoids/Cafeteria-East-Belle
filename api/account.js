@@ -192,8 +192,7 @@ app.post("/sendVerifyEmail", async (req, res, next) => {
     catch (err) {
         next(err);
     }
-}, setVerifyAccountTkn,
-function(req, res) {
+}, function(req, res) {
 
 })
 

@@ -47,7 +47,7 @@ export default function Cadastro() {
                     <label className={styles.lbl} htmlFor="email">E-mail</label>
                     <input
                         required
-                        className={`${styles.input} ${styles.cnpj}`}
+                        className={`${styles.input}`}
                         type="email"
                         name="email"
                     />
@@ -72,7 +72,7 @@ async function login(e, setAlert) {
     e.preventDefault();
 
     const data = {
-        identifier: e.target.email.value,
+        identityDocument: e.target.email.value,
         password: e.target.password.value,
         type: "client",
     }

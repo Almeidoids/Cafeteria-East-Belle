@@ -63,7 +63,7 @@ export default function Cadastro() {
                     <label className={styles.lbl} htmlFor="cpf">CPF</label>
                     <input
                         required
-                        className={`${styles.input} ${styles.cnpj}`}
+                        className={`${styles.input}`}
                         type="text"
                         name="cpf"
                         pattern="\d{3}\.\d{3}\.\d{3}\-\d{2}"
