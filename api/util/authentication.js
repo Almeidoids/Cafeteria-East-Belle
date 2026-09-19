@@ -47,7 +47,6 @@ function getTkn(req, res) {
     jwt.verify(acessToken, process.env.secretKey, function (err, user) {
         if (err) {
             throw new HTTPErrors("Acesso NÃO autorizado", 403);
-            // return res.status(403).json({ error: "Acesso NÃO autorizado" })
         };
 
         returnTkn = user;
@@ -77,7 +76,6 @@ function refreshTkn(refreshToken, res) {
     jwt.verify(refreshToken, process.env.secretKey, function (err, user) {
         if (err) {
             throw new HTTPErrors("Sua sessão expirou", 403);
-            // res.status(403).json({ error: "Sua sessão expirou" }); // Manda um aviso caso dê erro
         }
 
         const newAcessToken = jwt.sign({ name: user.name, type: user.type }, process.env.secretKey, { expiresIn: "30m" });
@@ -90,28 +88,5 @@ function refreshTkn(refreshToken, res) {
 
     return resultTkn;
 }
-
-// // Adiciona o refreshToken e o AcessToken a cookies
-// function setCookie(res, refresh, acess) {
-//     const expiresRefreshtoken = 60 * 60 * 24 * 3; // Tempo para o cookie do Refreshtoken expirar
-//     const expiresAcessToken = 60 * 30; // Tempo para o cookie do Acesstoken expirar
-//
-//     // Define cada cookie, com propriedades seguras, para o front-end não ser capaz de acessá-los
-//     res.setHeader("Set-Cookie",
-//         [
-//             `refreshToken=${refresh}; ` +
-//             "HttpOnly; " +
-//             "Secure; " +
-//             "SameSite=strict; " +
-//             `Max-Age=${expiresRefreshtoken};` +
-//             "path=/",
-//
-//             `acessToken=${acess}; ` +
-//             "HttpOnly; " +
-//             "Secure; " +
-//             "SameSite=strict; " +
-//             `Max-Age=${expiresAcessToken};` +
-//             "path=/",
-//         ]
 
 module.exports = { setTkn, getTkn };
