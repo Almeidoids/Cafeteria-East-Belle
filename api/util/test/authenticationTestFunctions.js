@@ -26,8 +26,6 @@ function expectCookiesHasRecorded(res, tknTest, cookieOptions) {
     const threeDays = 1000 * 60 * 60 * 24 * 3;
 
     expect(res.cookie).toHaveBeenCalledTimes(2);
-        // expectCookieHasRecorded(res, tknTest, {name: "acessToken", options: cookieOptions, age: fifteenMinutes});
-        // expectCookieHasRecorded(res, tknTest, {name: "refreshToken", options: cookieOptions, age: threeDays});
     cookieOptions.maxAge = fifteenMinutes;
     expect(res.cookie.mock.calls[0]).toEqual(["acessToken", tknTest, cookieOptions]);
     cookieOptions.maxAge = threeDays;
