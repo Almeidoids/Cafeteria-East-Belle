@@ -1,7 +1,8 @@
+const jwt = require("jsonwebtoken");
 const { setTkn, getTkn } = require("./authentication");
 const HTTPErrors = require("./HTTPErrors");
-const jwt = require("jsonwebtoken");
 const { testResultOfSignJWT, mockJWTVerify, testGetTkn, testGetTknErrorThrown, expectCookiesHasRecorded, prepareRefreshTknTest } = require("./test/authenticationTestFunctions");
+let mongoose = null;
 
 describe("Testando funções de authentication.js", function () {
     const tknTest = "token gerado por jwt";
@@ -77,6 +78,58 @@ describe("Testando funções de authentication.js", function () {
         prepareRefreshTknTest(tkns, req);
         getTkn(req, res);
         expectCookiesHasRecorded(res, tknTest, cookieOptions);
+    })
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    })
+});
+
+describe("Testando funções de connect.js", function() {
+    let res = null;
+    let connect = null;
+    
+    beforeEach(() => {
+        jest.resetModules();
+
+        res = {
+            status: jest.fn(() => res ),
+            json: jest.fn()
+        };
+
+        mongoose = require("mongoose");
+        jest.spyOn(mongoose, "connect").mockResolvedValue(true);
+        connect = require("./connect");
+    })
+
+
+    test("Testando conexão do mongoose com o banco", async function() {
+        const next = jest.fn();
+        await connect(null, res, next);
+
+        expect(mongoose.connect).toHaveBeenCalledTimes(1);
+        expect(next).toHaveBeenCalledTimes(1);
+    })
+
+    test("Não executar connect caso a conexão já esteja aberta.", async function() {
+        const next = jest.fn();
+        await connect(null, res, next);
+        await connect(null, res, next);
+
+        expect(mongoose.connect).toHaveBeenCalledTimes(1);
+        expect(next).toHaveBeenCalledTimes(2);
+    })
+
+    test("Caso haja erro na conexão com o banco.", async function() {
+        mongoose.connect = jest.fn(() => {
+            throw new Error();
+        });
+
+        const next = jest.fn();
+        await connect(null, res, next);
+
+        expect(next).toHaveBeenCalledTimes(1);
+        expect(next).toHaveBeenCalledWith(Error());
     })
 
     afterEach(() => {

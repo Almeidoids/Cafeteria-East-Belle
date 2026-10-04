@@ -8,6 +8,6 @@ module.exports = ((err, req, res, next) => {
         return res.status(err.code).json({ err: err.message });
     }
     else {
-        return res.status(500).json({ err: "Erro no servidor" });
+        return res.status(500).json({ err: "Erro interno no servidor" });
     }
 })
