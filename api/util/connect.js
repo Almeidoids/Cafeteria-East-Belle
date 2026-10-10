@@ -11,13 +11,12 @@ async function connect(req, res, next) {
             isConnected = true; // Muda variavel isConnected para true, avisando que já está conectado
         }
         
+        console.log("Conectado ao banco")
         next(); // Chama a próxima função
     }
     // Se der erro
     catch (err) {
-        console.log(err);
         next(err);
-        // res.status(500).json({error: `Erro ao conectar ao banco`}) // Retorna resposta com erro
     };
 }
 

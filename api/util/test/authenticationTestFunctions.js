@@ -27,9 +27,9 @@ function expectCookiesHasRecorded(res, tknTest, cookieOptions) {
 
     expect(res.cookie).toHaveBeenCalledTimes(2);
     cookieOptions.maxAge = fifteenMinutes;
-    expect(res.cookie.mock.calls[0]).toEqual(["acessToken", tknTest, cookieOptions]);
+    expect(res.cookie).toHaveBeenNthCalledWith(1, "acessToken", tknTest, cookieOptions);
     cookieOptions.maxAge = threeDays;
-    expect(res.cookie.mock.calls[1]).toEqual(["refreshToken", tknTest, cookieOptions]);
+    expect(res.cookie).toHaveBeenNthCalledWith(2, "refreshToken", tknTest, cookieOptions);
 }
 
 function prepareRefreshTknTest(tkns, req, error = false) {

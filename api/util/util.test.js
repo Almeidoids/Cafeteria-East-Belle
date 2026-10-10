@@ -2,7 +2,8 @@ const jwt = require("jsonwebtoken");
 const { setTkn, getTkn } = require("./authentication");
 const HTTPErrors = require("./HTTPErrors");
 const { testResultOfSignJWT, mockJWTVerify, testGetTkn, testGetTknErrorThrown, expectCookiesHasRecorded, prepareRefreshTknTest } = require("./test/authenticationTestFunctions");
-let mongoose = null;
+let mongoose = require("mongoose");
+const { default: next } = require("next");
 
 describe("Testando funções de authentication.js", function () {
     const tknTest = "token gerado por jwt";
@@ -86,53 +87,65 @@ describe("Testando funções de authentication.js", function () {
 });
 
 describe("Testando funções de connect.js", function() {
-    let res = null;
-    let connect = null;
-    
+    const connectionError = new Error("Falha ao se conectar ao banco");
+    let next = null;
+    let expectConnectionBehavior = null;
+    let attemptConnectionMultipleTimes = null;
+
     beforeEach(() => {
         jest.resetModules();
-
-        res = {
-            status: jest.fn(() => res ),
-            json: jest.fn()
-        };
-
+        
         mongoose = require("mongoose");
         jest.spyOn(mongoose, "connect").mockResolvedValue(true);
-        connect = require("./connect");
+        next = jest.fn();
+        
+        ({ expectConnectionBehavior, attemptConnectionMultipleTimes } = require("./test/connectTestFunctions"));
     })
 
 
-    test("Testando conexão do mongoose com o banco", async function() {
-        const next = jest.fn();
-        await connect(null, res, next);
-
-        expect(mongoose.connect).toHaveBeenCalledTimes(1);
-        expect(next).toHaveBeenCalledTimes(1);
+    test("conectar com o banco", async function() {
+        await attemptConnectionMultipleTimes(1, next);
+        expectConnectionBehavior(next, {
+            connect: { toHaveBeenCalledTimes: 1 },
+            next: { toHaveBeenCalledTimes: 1 },
+        });
     })
 
-    test("Não executar connect caso a conexão já esteja aberta.", async function() {
-        const next = jest.fn();
-        await connect(null, res, next);
-        await connect(null, res, next);
-
-        expect(mongoose.connect).toHaveBeenCalledTimes(1);
-        expect(next).toHaveBeenCalledTimes(2);
+    test("Não conectar novamente caso já conectado.", async function() {
+        await attemptConnectionMultipleTimes(2, next);
+        expectConnectionBehavior(next, {
+            connect: { toHaveBeenCalledTimes: 1 },
+            next: { toHaveBeenCalledTimes: 2 },
+        });        
     })
 
-    test("Caso haja erro na conexão com o banco.", async function() {
-        mongoose.connect = jest.fn(() => {
-            throw new Error();
+    test("Lançar erro caso haja erro na conexão com o banco.", async function() {
+        mongoose.connect.mockRejectedValue(connectionError)
+
+        await attemptConnectionMultipleTimes(1, next);
+        expectConnectionBehavior(next, {
+            connect: { toHaveBeenCalledTimes: 1 },
+            next: { toHaveBeenCalledTimes: 1 },
         });
 
-        const next = jest.fn();
-        await connect(null, res, next);
+        expect(next).toHaveBeenCalledWith(connectionError);
+    })
 
-        expect(next).toHaveBeenCalledTimes(1);
-        expect(next).toHaveBeenCalledWith(Error());
+    test("Se chamado novamente, reconectar caso primeira tentativa dê erro.", async function() {
+        mongoose.connect.mockRejectedValueOnce(connectionError)
+        
+        await attemptConnectionMultipleTimes(2, next)
+        
+        expectConnectionBehavior(next, {
+            connect: { toHaveBeenCalledTimes: 2 },
+            next: { toHaveBeenCalledTimes: 2 },
+        });
+
+        expect(next).toHaveBeenNthCalledWith(1, connectionError);
+        expect(next).toHaveBeenNthCalledWith(2)
     })
 
     afterEach(() => {
         jest.restoreAllMocks();
     })
-})
+});
