@@ -23,7 +23,7 @@ app.get("/", (req, res, next) => {
     }
 })
 
-app.get("/supplier/:supplier", connect, async (req, res) => {
+app.get("/supplier/:supplier", connect, async (req, res, next) => {
     const { supplier } = req.params;
 
     try {
