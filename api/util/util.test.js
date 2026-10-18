@@ -4,16 +4,21 @@ const bcrypt = require("bcrypt");
 
 // Funções testadas
 const { setTkn, getTkn } = require("./authentication");
-const { adjustUserDataBeforeSave, createUser, ChangeErrToHttpErrorIfIsUserDuplicated, getUser, updateOneUser } = require("./loginOrSign");
+const { ChangeErrToHttpErrorIfIsUserDuplicated } = require("./loginOrSign");
 
 // Funções utilitárias
-const { testResultOfSignJWT, mockJWTVerify, testGetTkn, testGetTknErrorThrown, expectCookiesHasRecorded, prepareRefreshTknTest } = require("./test/authenticationTestFunctions");
+const { 
+    testResultOfSignJWT, mockJWTVerify, testGetTkn, testGetTknErrorThrown, 
+    expectCookiesHasRecorded, prepareRefreshTknTest 
+} = require("./test/authenticationTestFunctions");
+const { 
+    mockModelFunctions, expectUpdatedUser, expectUserDataToBePrepared, 
+    expectUserModelToBeCreated, expectOriginalErrorToBeReturned, expectUserToBeFound, 
+    expectNotFoundErrorWhenUserNotFound, expectNotFoundErrorWhenUserNotFoundInUpdate, createReq
+} = require("./test/loginOrSignTestFunctions");
 
 // Erros customizados
 const HTTPErrors = require("./HTTPErrors");
-
-// Modelos
-const { Supplier, Client } = require("../models/models");
 
 describe("Testando funções de authentication.js", function () {
     const tknTest = "token gerado por jwt";
@@ -161,79 +166,31 @@ describe("Testando funções de connect.js", function () {
 });
 
 describe("Testando funções de loginOrSign.js", function () {
-    const body = {
-        name: "teste",
-        address: "teste",
-        password: "teste",
-        email: "teste@teste.com",
-        identityDocument: "12.345.678./9101-11",
-        type: "supplier"
-    };
-    let req = null;
-    const search = {
-        key: "_id",
-        value: 1
-    }
-
     beforeEach(() => {
-        req = { body: { ...body } };
+        createReq();
 
-        jest.spyOn(bcrypt, "hash").mockReturnValue("123456");
-
-        jest.spyOn(Supplier, "findOne").mockReturnValue({
-            exec: jest.fn(() => req.body)
-        });
-        jest.spyOn(Client, "findOne").mockReturnValue({
-            exec: jest.fn(() => req.body)
-        });
-
-        jest.spyOn(Supplier, "findOneAndUpdate").mockReturnValue(req.body);
-        jest.spyOn(Client, "findOneAndUpdate").mockReturnValue(req.body);
+        jest.spyOn(bcrypt, "hash").mockResolvedValue("123456");
+        mockModelFunctions("supplier");
+        mockModelFunctions("client");
     })
 
     test("Pegar corpo da requisição como fornecedor", async function () {
-        const responseData = {
-            name: req.body.name,
-            email: req.body.email,
-            address: req.body.address,
-            password: "123456",
-            cnpj_cpf: req.body.identityDocument
-        };
-
-        const userData = await adjustUserDataBeforeSave(req);
-        expect(userData).toEqual(responseData);
+        await expectUserDataToBePrepared("supplier");
     });
 
-    test("Pegar corpo da requisição como cliente", async function() {
-        const responseData = {
-            name: req.body.name,
-            email: req.body.email,
-            address: req.body.address,
-            password: "123456",
-            cpf: req.body.identityDocument
-        };
-        req.body.type = "client";
-
-        const userData = await adjustUserDataBeforeSave(req);
-        expect(userData).toEqual(responseData);
+    test("Pegar corpo da requisição como cliente", async function () {
+        await expectUserDataToBePrepared("client");
     })
 
     test("Criar modelo de usuário como fornecedor", async function () {
-        let userData = await adjustUserDataBeforeSave(req);
-        let user = createUser(req.body.type, userData);
-
-        expect(user.constructor).toEqual(Supplier);
+        await expectUserModelToBeCreated("supplier");
     });
 
-    test("Criar modelo de usuario como cliente", async function() {
-        req.body.type = "client";
-        
-        const userData = await adjustUserDataBeforeSave(req);
-        const user = createUser(req.body.type, userData);
-        expect(user.constructor).toEqual(Client);
+    test("Criar modelo de usuario como cliente", async function () {
+        await expectUserModelToBeCreated("client");
     })
 
-    test("Lançar erro 400 caso usuário já exista no cadastro de usuários", function() {
+    test("Lançar erro 400 caso usuário já exista no cadastro de usuários", function () {
         const err = {code: 11000};
         const expectedError = new HTTPErrors("Este usuário já existe", 400);
 
@@ -241,52 +198,34 @@ describe("Testando funções de loginOrSign.js", function () {
         expect(notFindError).toEqual(expectedError);
     })
 
-    test("Retornar erro padrão caso a exceção não seja de usuário duplicado", function() {
-        const err = new Error("Erro no servidor");
-        const returnedError = ChangeErrToHttpErrorIfIsUserDuplicated(err);
-        
-        expect(returnedError).toEqual(err);
+    test("Retornar erro padrão caso a exceção não seja de usuário duplicado", function () {
+        expectOriginalErrorToBeReturned(new Error("Erro no servidor"));
     })
 
-    test("Procurar fornecedor", async function() {
-        const identifier = req.body.cnpj_cpf;
-        const user = await getUser(identifier, "supplier", req.body.cnpj_cpf);
-        expect(user).toEqual(req.body);
+    test("Procurar fornecedor", async function () {
+        await expectUserToBeFound("supplier");
     });
 
-    test("Procurar cliente", async function() {
-        const identifier = req.body.cnpj_cpf;
-        const user = await getUser(identifier, "client", req.body.cnpj_cpf);
-        expect(user).toEqual(req.body);
+    test("Procurar cliente", async function () {
+        await expectUserToBeFound("client");
     })
 
-    test("Lançar erro caso não encontre fornecedor ou cliente", function() {
-        Supplier.findOne.mockReturnValue({
-            exec: jest.fn(() => null)
-        });
-        Client.findOne.mockReturnValue({
-            exec: jest.fn(() => null)
-        });
-
-        expect(async () => getUser(req.body.cnpj_cpf, "supplier", req.body.cnpj_cpf)).rejects.toThrow(new HTTPErrors("Usuario não encontrado", 404));
-        expect(async () => getUser(req.body.cnpj_cpf, "client", req.body.cnpj_cpf)).rejects.toThrow(new HTTPErrors("Usuario não encontrado", 404));
+    test("Lançar erro caso não encontre fornecedor ou cliente", async function () {
+        await expectNotFoundErrorWhenUserNotFound("supplier");
+        await expectNotFoundErrorWhenUserNotFound("client");
     })
 
-    test("Atualizar fornecedor", async function() {
-        const updatedUser = await updateOneUser(req.body, "supplier", search);
-        expect(updatedUser).toEqual(req.body);
+    test("Atualizar fornecedor", async function () {
+        await expectUpdatedUser("supplier");
     })
 
-    test("Atualizar cliente", async function() {
-        const updatedUser = await updateOneUser(req.body, "client", search);
-        expect(updatedUser).toEqual(req.body);
+    test("Atualizar cliente", async function () {
+        await expectUpdatedUser("client");
     })
 
-    test("Lançar erro caso não encontre fornecedor ou cliente para atualizar", async function() {
-        Supplier.findOneAndUpdate.mockReturnValue(null);
-        Client.findOneAndUpdate.mockReturnValue(null);
-        expect(() => updateOneUser(req.body, "supplier", search)).rejects.toThrow(new HTTPErrors("Usuario não encontrado", 404));
-        expect(() => updateOneUser(req.body, "client", search)).rejects.toThrow(new HTTPErrors("Usuario não encontrado", 404));
+    test("Lançar erro caso não encontre fornecedor ou cliente para atualizar", async function () {
+        await expectNotFoundErrorWhenUserNotFoundInUpdate("supplier");
+        await expectNotFoundErrorWhenUserNotFoundInUpdate("client");
     })
 
     afterEach(() => {
