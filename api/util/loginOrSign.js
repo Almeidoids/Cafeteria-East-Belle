@@ -35,10 +35,7 @@ function ChangeErrToHttpErrorIfIsUserDuplicated(err) {
 
 async function getUser(identifier, type, { search } = user[type]) {
     const { model } = user[type];
-    console.log(search);
-    console.log(identifier);
     const returnUser = await model.findOne({ [`${search}`]: identifier }).exec();
-    console.log(returnUser);
     throwErrorIfNotFinded(returnUser);
 
     return returnUser;

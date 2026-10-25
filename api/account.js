@@ -46,7 +46,7 @@ app.post("/cadastro", connect,
         const newUser = createUser(type, data);
 
         try {
-            await newUser.save()
+            await newUser.save();
             req.body.type = type;
             next();
         }
@@ -87,12 +87,6 @@ app.route("/:type/:username/edit").get(connect, async (req, res, next) => {
     try {
         const search = "name";
         const user = await getUser(username, type, {search});
-        // if (type === "client") {
-        //     user = await Client.findOne({ name: username }).exec();
-        // }
-        // if (type === "supplier") {
-        //     user = await Supplier.findOne({ name: username }).exec();
-        // }
 
         const data = {
             id: user._id,
@@ -114,19 +108,11 @@ app.route("/:type/:username/edit").get(connect, async (req, res, next) => {
 
         try {
             updateOneUser(items, type, {key: "name", value: username});
-            // if (type === "client") {
-            //     user = await Client.findOneAndUpdate({ name: username }, { $set: items });
-            // }
-            // if (type === "supplier") {
-            //     user = await Supplier.findOneAndUpdate({ name: username }, { $set: items });
-            // }
-            
+
             if ("name" in items) {
                 req.type = type;
                 setTkn(req, res);
             }
-
-            res.send("Sucesso");
         }
 
         catch (err) {
