@@ -32,6 +32,9 @@ import HTTPErrors from "./util/HTTPErrors";
 // Modelos
 import { Client, Supplier } from "./models/models";
 
+// Testes
+import { mockUserModel, postUserReq } from "./test/accountTestFunctions";
+
 describe("Testes de account.js", function () {
     const tkn = { name: "teste", type: "client" };
     const data = {
@@ -43,29 +46,27 @@ describe("Testes de account.js", function () {
     }
     const supplierData = { ...data, type: "supplier" }
     const clientData = { ...data, type: "client" }
-
     const modelDataTest = { _id: new mongoose.Types.ObjectId("123456789123456789012345"), ...data };
     const editPassword = {
         oldPassword: "Teste",
         newPassword: "123456"
     }
+    const userType = [
+        ["supplier", Supplier, { ...data, type: "supplier" }], 
+        ["client", Client, { ...data, type: "client" }]
+    ];
 
     beforeEach(() => {
         getTkn.mockReturnValue(tkn);
-        connect.mockImplementation((editPassword, res, next) => next());
+        connect.mockImplementation((req, res, next) => next());
 
-        jest.spyOn(Supplier, "findOne").mockReturnValue({
-            exec: jest.fn(() => Supplier(modelDataTest))
-        });
-        jest.spyOn(Supplier.prototype, "save").mockResolvedValue({});
-        jest.spyOn(Client, "findOne").mockReturnValue({
-            exec: jest.fn(() => Client(modelDataTest))
-        });
-        jest.spyOn(Client.prototype, "save").mockResolvedValue({});
+        mockUserModel("supplier", modelDataTest);
+        mockUserModel("client", modelDataTest);
+
         jest.spyOn(bcrypt, "compare").mockResolvedValue(true);
 
-        setTkn.mockImplementation((editPassword, res) => {
-            res.json({ [`${data.type}`]: data.name })
+        setTkn.mockImplementation((req, res) => {
+            res.json({ [`${req.type}`]: req.body.name })
         })
         getUser.mockResolvedValue(modelDataTest);
     })
@@ -92,163 +93,145 @@ describe("Testes de account.js", function () {
     })
 
     test("retornar erro na requisição para retornar id de fornecedor.", async function () {
-        Supplier.findOne = jest.fn(() => ({
+        jest.spyOn(Supplier, "findOne").mockReturnValue({
             exec: jest.fn(() => null)
-        }))
+        });
 
         const res = await request(app).get("/account/supplier/123").expect(404);
         expect(res.body).toEqual({ err: "Fornecedor não encontrado" });
     })
 
-    test("Cadastrar usuário. /supplier/cadastro", async function () {
-        const res1 = await request(app).post("/account/cadastro")
-            .send(supplierData).expect(200);
-        const res2 = await request(app).post("/account/cadastro")
-            .send(clientData).expect(200);
-
-        expect(res1.body).toEqual({ [data.type]: data.name });
-        expect(res2.body).toEqual({ [data.type]: data.name });
+    test.each(userType)("Cadastrar usuário %s. /account/cadastro", async function (type, model, userData) {
+        await postUserReq({
+            url: "/account/cadastro",
+            status: 200,
+            expectedResponse: { [userData.type]: userData.name }
+        }, userData);
     })
 
-    test("Lançar erro caso usuário já exista", async function () {
-        const throwError = () => {
-            const err = new Error();
-            err.code = 11000;
-            throw err;
-        }
+    test.each(userType)("Lançar erro caso %s já exista", async function (type, model, userData) {
+        const err = new Error();
+        err.code = 11000;
 
-        Supplier.prototype.save = jest.fn(() => throwError());
-        Client.prototype.save = jest.fn(() => throwError());
+        jest.spyOn(model.prototype, "save").mockRejectedValue(err);
 
-        const res1 = await request(app).post("/account/cadastro")
-            .send(supplierData).expect(400);
-        const res2 = await request(app).post("/account/cadastro")
-            .send(clientData).expect(400);
-
-        expect(res1.body).toEqual({ err: "Este usuário já existe" });
-        expect(res2.body).toEqual({ err: "Este usuário já existe" });
+        await postUserReq({
+            url: "/account/cadastro",
+            status: 400,
+            expectedResponse: { err: "Este usuário já existe" }
+        }, userData);
     });
 
-    test("Fazer login. /supplier/login", async function () {
-        const res1 = await request(app).post("/account/login")
-            .send(supplierData).expect(200);
-        const res2 = await request(app).post("/account/login")
-            .send(clientData).expect(200);
-
-        expect(res1.body).toEqual({ [data.type]: data.name });
-        expect(res2.body).toEqual({ [data.type]: data.name });
+    test.each(userType)("Fazer login. /supplier/login", async function (type, model, userData) {
+        await postUserReq({
+            url: "/account/login",
+            status: 200,
+            expectedResponse: { [userData.type]: userData.name }
+        }, userData);
     });
 
-    test("Lançar erro caso senha de login esteja incorreta", async function () {
-        bcrypt.compare = jest.fn(() => false);
+    test.each(userType)("Lançar erro caso senha de login esteja incorreta", async function (type, model, userData) {
+        jest.spyOn(bcrypt, "compare").mockResolvedValue(false);
 
-        const res1 = await request(app).post("/account/login")
-            .send(supplierData).expect(401);
-        const res2 = await request(app).post("/account/login")
-            .send(clientData).expect(401);
-
-        expect(res1.body).toEqual({ err: "Senha incorreta" });
-        expect(res2.body).toEqual({ err: "Senha incorreta" });
+        await postUserReq({
+            url: "/account/login",
+            status: 401,
+            expectedResponse: { err: "Senha incorreta" }
+        }, userData);
     });
 
-    test("Pegar dados do usuário para auto-preenchimento em campos de formulário para edição. GET account/:type/:username/edit", async function () {
+    test.each(userType)("Pegar dados do usuário para auto-preenchimento em campos de formulário para edição. GET account/:type/:username/edit", async function (type, model, userData) {
         const editData = {
             id: "123456789123456789012345",
-            name: data.name,
-            email: data.email,
-            address: data.address,
+            name: userData.name,
+            email: userData.email,
+            address: userData.address,
         };
 
-        const res1 = await request(app).get("/account/supplier/teste/edit").expect(200);
-        const res2 = await request(app).get("/account/client/teste/edit").expect(200);
-        expect(res1.body).toEqual({
-            data: editData
-        });
-        expect(res2.body).toEqual({
-            data: editData
-        });
+        const res1 = await request(app).get(`/account/${type}/teste/edit`).expect(200);
+        expect(res1.body).toEqual({ data: editData });
     });
 
-    test("Tratar erro ao pegar dados do usuário", async function () {
+    test.each(userType)("Tratar erro ao pegar dados do usuário", async function (type, model, userData) {
         getUser.mockImplementation(() => {
             throw new Error();
         });
 
-        const res1 = await request(app).get("/account/supplier/teste/edit").expect(500);
-        const res2 = await request(app).get("/account/client/teste/edit").expect(500);
+        const res1 = await request(app).get(`/account/${type}/teste/edit`).expect(500);
         expect(res1.body).toEqual({ err: "Erro interno no servidor" });
-        expect(res2.body).toEqual({ err: "Erro interno no servidor" });
     })
 
-    test("Editar usuario. POST account/:type/:username/edit", async function () {
-        const res1 = await request(app).post("/account/supplier/teste/edit")
-            .send(supplierData).expect(200);
-        const res2 = await request(app).post("/account/client/teste/edit")
-            .send(clientData).expect(200);
-
-        expect(res1.body).toEqual({ [data.type]: data.name });
-        expect(res2.body).toEqual({ [data.type]: data.name });
+    test.each(userType)("Editar usuario. POST account/:type/:username/edit", async function (type, model, userData) {
+        await postUserReq({
+            url: `/account/${type}/teste/edit`,
+            status: 200,
+            expectedResponse: { [userData.type]: userData.name }
+        }, userData);
     })
 
-    test("Tratar erro ao atualizar dados", async function () {
+    test.each(userType)("Tratar erro ao atualizar dados", async function (type, model, userData) {
         updateOneUser.mockImplementation(() => {
             throw new Error();
         })
 
-        const res1 = await request(app).post("/account/supplier/teste/edit")
-            .send(data).expect(500);
-        const res2 = await request(app).post("/account/client/teste/edit")
-            .send(data).expect(500);
-        expect(res1.body).toEqual({ err: "Erro interno no servidor" });
-        expect(res2.body).toEqual({ err: "Erro interno no servidor" });
+        await postUserReq({
+            url: `/account/${type}/teste/edit`,
+            status: 500,
+            expectedResponse: { err: "Erro interno no servidor" }
+        }, userData);
     })
 
-    test("Editar senha de fornecedor. /:type/:username/edit/senha", async function () {
-        const res = await request(app).post("/account/supplier/teste/edit/senha")
-            .send(editPassword).expect(200);
-
-        expect(res.text).toBe("Sucesso");
+    test.each(userType)("Editar senha de %s. /:type/:username/edit/senha", async function (type, model) {
+        await postUserReq({
+            url: `/account/${type}/teste/edit/senha`,
+            status: 200,
+            expectedResponse: "Sucesso"
+        }, editPassword, "text");
+        expect(model.prototype.save).toHaveBeenCalled();
     })
 
-    test("Editar senha de cliente", async function () {
-        const res = await request(app).post("/account/client/teste/edit/senha")
-            .send(editPassword).expect(200);
-
-        expect(res.text).toBe("Sucesso");
-    })
-
-    test("Editar senha de cliente", async function () {
-        const res = await request(app).post("/account/client/teste/edit/senha")
-            .send(editPassword).expect(200);
-
-        expect(res.text).toBe("Sucesso");
-    })
-
-    test("Lançar erro caso usuário não seja encontrado", async function () {
-        Supplier.findOne = jest.fn(() => ({
+    test.each(userType)("Lançar erro caso %s não seja encontrado", async function (type, model) {
+        jest.spyOn(model, "findOne").mockReturnValue({
             exec: jest.fn(() => null)
-        }));
-        const res = await request(app).post("/account/supplier/teste/edit/senha")
-            .send(editPassword).expect(404);
-
-        expect(res.body).toEqual({ err: "Usuario não encontrado" });
+        });
+        await postUserReq({
+            url: `/account/${type}/teste/edit/senha`,
+            status: 404,
+            expectedResponse: { err: "Usuario não encontrado" }
+        }, editPassword);
+        expect(model.findOne).toHaveBeenCalledWith({name: "teste"});
     });
 
-    test("Lançar erro caso senha esteja incorreta", async function () {
-        bcrypt.compare = jest.fn(() => false);
-        const res = await request(app).post("/account/supplier/teste/edit/senha")
-            .send(editPassword).expect(401);
-
-        expect(res.body).toEqual({ err: "Senha incorreta" });
+    test.each(userType)("Lançar erro caso senha do %s esteja incorreta", async function (type, model, userData) {
+        jest.spyOn(bcrypt, "compare").mockResolvedValue(false);
+        await postUserReq({
+            url: `/account/${type}/teste/edit/senha`,
+            status: 401,
+            expectedResponse: { err: "Senha incorreta" }
+        }, editPassword);
+        expect(bcrypt.compare).toHaveBeenCalledWith(editPassword.oldPassword, userData.password);
     });
 
     test("Limpar cookies de autenticação. /account/exit", async function () {
         const res = await request(app).get("/account/exit");
+        const cookies = res.headers["set-cookie"];
+        const cookie = [];
+        
+        cookies.forEach(function (value) {
+            cookie.push(value.split(";")[0].split("=")[1]);
+        })
+
         expect(res.text).toBe("Limpeza concluida");
+
+        cookie.forEach(function (value) {
+            console.log(value);
+            expect(value).toBe("");
+        })
     })
 
     afterEach(() => {
         jest.restoreAllMocks();
+        jest.resetAllMocks();
     })
 
 });

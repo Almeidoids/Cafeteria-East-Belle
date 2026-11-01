@@ -47,7 +47,7 @@ app.post("/cadastro", connect,
 
         try {
             await newUser.save();
-            req.body.type = type;
+            req.type = type;
             next();
         }
         catch (err) {
@@ -107,7 +107,7 @@ app.route("/:type/:username/edit").get(connect, async (req, res, next) => {
         const { username, type } = req.params;
 
         try {
-            updateOneUser(items, type, {key: "name", value: username});
+            await updateOneUser(items, type, {key: "name", value: username});
 
             if ("name" in items) {
                 req.type = type;
@@ -128,6 +128,7 @@ app.post("/:type/:username/edit/senha", connect, async (req, res, next) => {
 
     try {
         if (type === "supplier") {
+            console.log("Antes de rodar findOne")
             user = await Supplier.findOne({ name: username }).exec();
         }
         if (type === "client") {
