@@ -84,7 +84,7 @@ app.route("/fornecedor/produto").post(upload.array("image", 4), connect,
         }
     }
 )
-.delete(connect, async (req, res) => {
+.delete(connect, async (req, res, next) => {
     const name = req.query.supplier;
 
     try {
@@ -126,7 +126,6 @@ app.route("/fornecedor/produto/edit/:id").get(connect, async (req, res, next) =>
     }
 })
 .post(upload.array("image", 4), connect, async (req, res, next) => {
-    console.log(req.body);
     const items = JSON.parse(req.body.items);
     const images = [];
     const { id } = req.params;
@@ -147,7 +146,7 @@ app.route("/fornecedor/produto/edit/:id").get(connect, async (req, res, next) =>
     }
 })
 
-app.post("/fornecedor/:fornecedor/editAll", connect, async (req, res) => {
+app.post("/fornecedor/produto/editAll", connect, async (req, res) => {
     const listEdit = req.body;
     
     const operation = listEdit.map(item => {
