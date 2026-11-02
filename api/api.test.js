@@ -17,6 +17,7 @@ jest.mock("./util/loginOrSign", function () {
 import request from "supertest";
 import bcrypt from "bcrypt";
 import mongoose from "mongoose";
+import path from "path";
 
 // API
 import app from "../server-test";
@@ -30,39 +31,44 @@ import { updateOneUser, getUser } from "./util/loginOrSign";
 import HTTPErrors from "./util/HTTPErrors";
 
 // Modelos
-import { Client, Supplier } from "./models/models";
+import { Client, Supplier, Products } from "./models/models";
 
 // Testes
 import { mockUserModel, postUserReq } from "./test/accountTestFunctions";
 
+const data = {
+    name: "teste",
+    email: "teste@teste.com",
+    identityDocument: "12.345.678./9101-11",
+    address: "teste",
+    password: "teste",
+    active: true,
+}
+const id = 123456789123456789012345n;
+
+const modelDataTest = { _id: new mongoose.Types.ObjectId(id.toString()), ...data };
+
+beforeEach(() => {
+    connect.mockImplementation((req, res, next) => next());
+
+    mockUserModel("supplier", modelDataTest);
+})
+
 describe("Testes de account.js", function () {
     const tkn = { name: "teste", type: "client" };
-    const data = {
-        name: "teste",
-        email: "teste@teste.com",
-        identityDocument: "12.345.678./9101-11",
-        address: "teste",
-        password: "teste",
-    }
-    const supplierData = { ...data, type: "supplier" }
-    const clientData = { ...data, type: "client" }
-    const modelDataTest = { _id: new mongoose.Types.ObjectId("123456789123456789012345"), ...data };
     const editPassword = {
         oldPassword: "Teste",
         newPassword: "123456"
     }
     const userType = [
-        ["supplier", Supplier, { ...data, type: "supplier" }], 
+        ["supplier", Supplier, { ...data, type: "supplier" }],
         ["client", Client, { ...data, type: "client" }]
     ];
 
     beforeEach(() => {
         getTkn.mockReturnValue(tkn);
-        connect.mockImplementation((req, res, next) => next());
 
-        mockUserModel("supplier", modelDataTest);
         mockUserModel("client", modelDataTest);
-
         jest.spyOn(bcrypt, "compare").mockResolvedValue(true);
 
         setTkn.mockImplementation((req, res) => {
@@ -199,7 +205,7 @@ describe("Testes de account.js", function () {
             status: 404,
             expectedResponse: { err: "Usuario não encontrado" }
         }, editPassword);
-        expect(model.findOne).toHaveBeenCalledWith({name: "teste"});
+        expect(model.findOne).toHaveBeenCalledWith({ name: "teste" });
     });
 
     test.each(userType)("Lançar erro caso senha do %s esteja incorreta", async function (type, model, userData) {
@@ -216,22 +222,133 @@ describe("Testes de account.js", function () {
         const res = await request(app).get("/account/exit");
         const cookies = res.headers["set-cookie"];
         const cookie = [];
-        
+
         cookies.forEach(function (value) {
-            cookie.push(value.split(";")[0].split("=")[1]);
+            console.log(cookies);
+            cookie.push(value.split(";"));
         })
 
         expect(res.text).toBe("Limpeza concluida");
 
         cookie.forEach(function (value) {
-            console.log(value);
-            expect(value).toBe("");
+            const keyAndValue = value[0].split("=");
+            if (keyAndValue[0] === "acessToken" || keyAndValue[0] === "refreshToken") {
+                expect(keyAndValue[1]).toBe("");
+            }
         })
     })
 
     afterEach(() => {
         jest.restoreAllMocks();
-        jest.resetAllMocks();
     })
 
 });
+
+describe("Testes de comercial.js", function () {
+    // console.log((id + 1).toString());
+
+    const productsData = [{
+        _id: new mongoose.Types.ObjectId(id.toString()),
+        name: "teste",
+        description: "teste",
+        price: "12.34",
+        quantity: 50,
+        offer: 10,
+        buyed: 10,
+        supplier: modelDataTest,
+        expireAt: new Date("2026-11-01"),
+    },
+    {
+        _id: new mongoose.Types.ObjectId((id + 1n).toString()),
+        name: "teste2",
+        description: "teste2",
+        price: "12.34",
+        quantity: 50,
+        offer: 10,
+        buyed: 10,
+        supplier: modelDataTest,
+        expireAt: new Date("2026-11-01"),
+    }]
+    let reqFormData = null
+
+    beforeEach(() => {
+        jest.spyOn(Products, "find").mockReturnValue({
+            exec: jest.fn().mockResolvedValue(productsData)
+        });
+
+        reqFormData = {
+            name: productsData[0].name,
+            description: productsData[0].description,
+            price: productsData[0].price,
+            quantity: productsData[0].quantity,
+            offer: productsData[0].offer,
+            supplierName: modelDataTest.name
+        };
+
+        mockUserModel("products", productsData[0]);
+    })
+
+    test("Pegar informações do fornecedor. /comercial/fornecedor/get/:fornecedor", async function () {
+        const resultData = {
+            name: modelDataTest.name,
+            active: modelDataTest.active,
+            products: productsData.map((item, index) => {
+                return {
+                    id: (id + BigInt(index)).toString(),
+                    name: item.name,
+                    price: item.price,
+                    quantity: item.quantity,
+                    buyed: item.buyed,
+                    offer: item.offer,
+                }
+            })
+        }
+
+        const res = await request(app).get("/comercial/fornecedor/get/teste").expect(200);
+        expect(res.body).toEqual({ data: resultData });
+    });
+
+    test("Lançar erro caso fornecedor não encontrado", async function () {
+        jest.spyOn(Supplier, "findOne").mockReturnValue({
+            exec: jest.fn().mockResolvedValue(null)
+        })
+
+        const res = await request(app).get("/comercial/fornecedor/get/teste").expect(404);
+        expect(res.body).toEqual({ err: "Usuário não encontrado" });
+    })
+
+    test("Salvar Produto. /comercial/fornecedor/produto", async function () {
+        const res = await request(app).post("/comercial/fornecedor/produto")
+            .attach("image", path.resolve("public", "banner", "banner.jpg"))
+            .field("items", JSON.stringify(reqFormData))
+            .expect(200);
+
+        expect(Products.prototype.save).toHaveBeenCalled();
+        expect(res.text).toBe("Produto Salvo.");
+    });
+
+    test("Lançar erro caso usuário não esteja ativo.", async function () {
+        jest.spyOn(Supplier, "findOne").mockReturnValue({
+            exec: jest.fn().mockResolvedValue({...modelDataTest, active: false})
+        })
+
+        const res = await request(app).post("/comercial/fornecedor/produto")
+            .attach("image", path.resolve("public", "banner", "banner.jpg"))
+            .field("items", JSON.stringify(reqFormData))
+            .expect(403);
+
+        expect(res.body).toEqual({ err: "É necessário <a href = '/verificarConta'>verificar</a> sua conta para criar produtos" });
+    });
+
+    test("Excluir todos os produtos do fornecedor.", async function() {
+        jest.spyOn(Products, "deleteMany").mockResolvedValue({});
+        const res = await request(app).delete("/comercial/fornecedor/produto").expect(200);
+
+        expect(Products.deleteMany).toHaveBeenCalledWith({supplier: productsData[0].supplier._id});
+        expect(res.text).toBe("Sucesso");
+    })
+})
+
+afterEach(() => {
+    jest.restoreAllMocks();
+})

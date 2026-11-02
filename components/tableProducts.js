@@ -22,7 +22,7 @@ import Alert from "./alert";
 // Util
 import createRefList from "../util/createRefList";
 
-export default function TableProducts({ products, setProducts, onError, className, ref }) {
+export default function TableProducts({ products, setProducts, onError, supplier, ref }) {
     const [search, setSearch] = useState("");
     const [listProducts, setListProducts] = useState([]);
     const [showModalExAll, setShowModalExAll] = useState(false);
@@ -39,7 +39,8 @@ export default function TableProducts({ products, setProducts, onError, classNam
     }, [products]);
 
     useEffect(() => {
-        const resArr = products.filter(value => value.name.includes(search))
+        const resArr = products.filter(value => value.name.includes(search));
+        console.log(products);
 
         setListProducts(resArr);
     }, [search])
@@ -149,7 +150,7 @@ export default function TableProducts({ products, setProducts, onError, classNam
             </table>
 
             {showModalExAll &&
-                <ModalConfirm setShowModal={setShowModalExAll} onClick={() => { excludeAll(onError, setShowModalExAll, setProducts) }} >
+                <ModalConfirm setShowModal={setShowModalExAll} onClick={() => { excludeAll(onError, setShowModalExAll, setProducts, supplier) }} >
                     <span className={styles.textBody}>Deseja Excluir todos os produtos?</span>
                 </ModalConfirm>
             }
@@ -329,8 +330,8 @@ function InputData({ val, itemkey, item, listEditValue, setListEdit }) {
     )
 }
 
-async function excludeAll(onError, setShowModalExAll, setProducts) {
-    const res = await fetch(`/comercial/fornecedor/produto`, {
+async function excludeAll(onError, setShowModalExAll, setProducts, supplier) {
+    const res = await fetch(`/comercial/fornecedor/produto/?supplier=${supplier}`, {
         method: "DELETE",
         headers: { "Content-Type": "application/json" }
     });

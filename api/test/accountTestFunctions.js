@@ -4,11 +4,12 @@ import request from "supertest";
 import app from "../../server-test";
 
 // Modelos
-import { Supplier, Client } from "../models/models";
+import { Supplier, Client, Products } from "../models/models";
 
 const model = Object.freeze({
     supplier: Supplier,
-    client: Client
+    client: Client,
+    products: Products
 })
 
 export function mockUserModel(type, modelDataTest) {

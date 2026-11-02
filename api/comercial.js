@@ -85,7 +85,7 @@ app.route("/fornecedor/produto").post(upload.array("image", 4), connect,
     }
 )
 .delete(connect, async (req, res) => {
-    const name = req.params.fornecedor;
+    const name = req.query.supplier;
 
     try {
         const supplier = await Supplier.findOne({ name: name }).exec();

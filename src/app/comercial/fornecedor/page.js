@@ -150,7 +150,7 @@ export default function Fornecedor({ }) {
                                         </div>
                                     </div>
                                     <div style={{ display: !products[0] ? "none" : "block" }}>
-                                        <TableProducts products={products} setProducts={setProducts} onError={(msg) => setAlert(msg)} />
+                                        <TableProducts products={products} setProducts={setProducts} onError={(msg) => setAlert(msg)} supplier = {supplier} />
                                     </div>
                                 </>
                             }
