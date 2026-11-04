@@ -35,7 +35,7 @@ import HTTPErrors from "./util/HTTPErrors";
 import { Client, Supplier, Products } from "./models/models";
 
 // Testes
-import { mockUserModel, postUserReq } from "./test/accountTestFunctions";
+import { mockQueryResult, mockBasicModelOperations, postUserReq } from "./test/api.testHelper";
 
 const data = {
     name: "teste",
@@ -46,13 +46,13 @@ const data = {
     active: true,
 }
 const id = 123456789123456789012345n;
-
 const modelDataTest = { _id: new mongoose.Types.ObjectId(id.toString()), ...data };
+const err = new Error();
 
 beforeEach(() => {
     connect.mockImplementation((req, res, next) => next());
 
-    mockUserModel("supplier", modelDataTest);
+    mockBasicModelOperations(Supplier, modelDataTest);
 })
 
 describe("Testes de account.js", function () {
@@ -69,7 +69,7 @@ describe("Testes de account.js", function () {
     beforeEach(() => {
         getTkn.mockReturnValue(tkn);
 
-        mockUserModel("client", modelDataTest);
+        mockBasicModelOperations(Client, modelDataTest);
         jest.spyOn(bcrypt, "compare").mockResolvedValue(true);
 
         setTkn.mockImplementation((req, res) => {
@@ -100,10 +100,7 @@ describe("Testes de account.js", function () {
     })
 
     test("retornar erro na requisição para retornar id de fornecedor.", async function () {
-        jest.spyOn(Supplier, "findOne").mockReturnValue({
-            exec: jest.fn(() => null)
-        });
-
+        mockQueryResult(Supplier, "findOne", null);
         const res = await request(app).get("/account/supplier/123").expect(404);
         expect(res.body).toEqual({ err: "Fornecedor não encontrado" });
     })
@@ -117,7 +114,6 @@ describe("Testes de account.js", function () {
     })
 
     test.each(userType)("Lançar erro caso %s já exista", async function (type, model, userData) {
-        const err = new Error();
         err.code = 11000;
 
         jest.spyOn(model.prototype, "save").mockRejectedValue(err);
@@ -198,9 +194,7 @@ describe("Testes de account.js", function () {
     })
 
     test.each(userType)("Lançar erro caso %s não seja encontrado", async function (type, model) {
-        jest.spyOn(model, "findOne").mockReturnValue({
-            exec: jest.fn(() => null)
-        });
+        mockQueryResult(model, "findOne", null);
         await postUserReq({
             url: `/account/${type}/teste/edit/senha`,
             status: 404,
@@ -271,23 +265,19 @@ describe("Testes de comercial.js", function () {
         images: image,
         expireAt: new Date("2026-11-01"),
     }]
-    let reqFormData = null
+    const reqFormData = {
+        name: productsData[0].name,
+        description: productsData[0].description,
+        price: productsData[0].price,
+        quantity: productsData[0].quantity,
+        offer: productsData[0].offer,
+        supplierName: modelDataTest.name
+    };
+    const editReqFormData = {...reqFormData, buyed: productsData[0].buyed};
 
     beforeEach(() => {
-        jest.spyOn(Products, "find").mockReturnValue({
-            exec: jest.fn().mockResolvedValue(productsData)
-        });
-
-        reqFormData = {
-            name: productsData[0].name,
-            description: productsData[0].description,
-            price: productsData[0].price,
-            quantity: productsData[0].quantity,
-            offer: productsData[0].offer,
-            supplierName: modelDataTest.name
-        };
-
-        mockUserModel("products", productsData[0]);
+        mockQueryResult(Products, "find", productsData);
+        mockBasicModelOperations(Products, productsData[0]);
     })
 
     test("Pegar informações do fornecedor. /comercial/fornecedor/get/:fornecedor", async function () {
@@ -311,9 +301,7 @@ describe("Testes de comercial.js", function () {
     });
 
     test("Lançar erro caso fornecedor não encontrado", async function () {
-        jest.spyOn(Supplier, "findOne").mockReturnValue({
-            exec: jest.fn().mockResolvedValue(null)
-        })
+        mockQueryResult(Supplier, "findOne", null);
 
         const res = await request(app).get("/comercial/fornecedor/get/teste").expect(404);
         expect(res.body).toEqual({ err: "Usuário não encontrado" });
@@ -321,7 +309,7 @@ describe("Testes de comercial.js", function () {
 
     test("Salvar Produto. POST /comercial/fornecedor/produto", async function () {
         const res = await request(app).post("/comercial/fornecedor/produto")
-            .attach("image", path.resolve("public", "banner", "banner.jpg"))
+            .attach("image", image)
             .field("items", JSON.stringify(reqFormData))
             .expect(200);
 
@@ -330,9 +318,7 @@ describe("Testes de comercial.js", function () {
     });
 
     test("Lançar erro caso usuário não esteja ativo.", async function () {
-        jest.spyOn(Supplier, "findOne").mockReturnValue({
-            exec: jest.fn().mockResolvedValue({ ...modelDataTest, active: false })
-        })
+        mockQueryResult(Supplier, "findOne", { ...modelDataTest, active: false });
 
         const res = await request(app).post("/comercial/fornecedor/produto")
             .attach("image", image)
@@ -344,21 +330,21 @@ describe("Testes de comercial.js", function () {
 
     test("Excluir todos os produtos do fornecedor. DELETE /comercial/fornecedor/produto", async function () {
         jest.spyOn(Products, "deleteMany").mockResolvedValue({});
-        const res = await request(app).delete("/comercial/fornecedor/produto").expect(200);
+        const res = await request(app).delete("/comercial/fornecedor/produto/?supplier=teste").expect(200);
 
         expect(Products.deleteMany).toHaveBeenCalledWith({ supplier: productsData[0].supplier._id });
         expect(res.text).toBe("Sucesso");
     })
 
     test("Capturar erro ao excluir todos os produtos", async function () {
-        const err = new Error()
         jest.spyOn(Products, "deleteMany").mockRejectedValue(err);
 
-        const res = await request(app).delete("/comercial/fornecedor/produto").expect(500);
+        const res = await request(app).delete("/comercial/fornecedor/produto/?supplier=teste").expect(500);
         expect(res.body).toEqual({ err: "Erro interno no servidor" });
     })
 
     test("Pegar dados do produto para auto-completar formulário de edição. GET /comercial/fornecedor/produto/edit/:id", async function () {
+        mockQueryResult(Products, "findById", productsData[0]);
         const result = {
             id: id.toString(),
             name: productsData[0].name,
@@ -369,19 +355,12 @@ describe("Testes de comercial.js", function () {
             images: productsData[0].images
         };
 
-        jest.spyOn(Products, "findById").mockReturnValue({
-            exec: jest.fn().mockResolvedValue(productsData[0])
-        });
-
-
         const res = await request(app).get(`/comercial/fornecedor/produto/edit/${id.toString()}`).expect(200);
         expect(res.body).toEqual({ data: result });
     })
 
     test("Lançar erro ao não encontrar produto para autocompletar formulário de edição", async function () {
-        jest.spyOn(Products, "findById").mockReturnValue({
-            exec: jest.fn().mockResolvedValue(null)
-        });
+        mockQueryResult(Products, "findById", null);
 
         const res = await request(app).get(`/comercial/fornecedor/produto/edit/${id.toString()}`).expect(404);
         expect(res.body).toEqual({ err: "Produto não encontrado." });
@@ -389,71 +368,60 @@ describe("Testes de comercial.js", function () {
 
     test("Editar produtos. POST /comercial/fornecedor/produto/edit/:id", async function () {
         jest.spyOn(Products, "findByIdAndUpdate").mockResolvedValue({});
-        const requestData = {
-            name: productsData[0].name,
-            description: productsData[0].description,
-            price: productsData[0].price,
-            quantity: productsData[0].quantity,
-            offer: productsData[0].offer,
-            buyed: productsData[0].buyed,
-        };
 
         const res = await request(app).post(`/comercial/fornecedor/produto/edit/${id.toString()}`)
             .attach("image", image)
-            .field("items", JSON.stringify(requestData)).expect(200);
+            .field("items", JSON.stringify(editReqFormData)).expect(200);
 
-        const resultData = {...requestData, images: [await fs.readFile(image)]};
-
+        const resultData = { ...editReqFormData, images: [await fs.readFile(image)] };
 
         expect(Products.findByIdAndUpdate).toHaveBeenCalledWith(id.toString(), { $set: resultData });
         expect(res.text).toBe("Sucesso")
     });
 
-    test("Capturar erro ao editar.", async function() {
-        const err = new Error()
+    test("Capturar erro ao editar.", async function () {
         jest.spyOn(Products, "findByIdAndUpdate").mockRejectedValue(err);
 
         const res = await request(app).post(`/comercial/fornecedor/produto/edit/${id.toString()}`)
             .attach("image", image)
-            .field("items", JSON.stringify(productsData[0])).expect(500);
+            .field("items", JSON.stringify(editReqFormData)).expect(500);
 
-        expect(res.body).toEqual({err: "Erro interno no servidor"})
+        expect(res.body).toEqual({ err: "Erro interno no servidor" })
     });
 
-    test("Editar diversos produtos. /comercial/fornecedor/produto/editAll", async function() {
+    test("Editar diversos produtos. /comercial/fornecedor/produto/editAll", async function () {
         jest.spyOn(Products, "bulkWrite").mockResolvedValue({});
-
         const res = await request(app).post("/comercial/fornecedor/produto/editAll").send(productsData).expect(200);
 
         expect(Products.bulkWrite).toHaveBeenCalled();
         expect(res.text).toBe("Sucesso");
     })
 
-    test("Capturar erro ao editar diversos produtos", async function() {
-        const err = new Error();
+    test("Capturar erro ao editar diversos produtos", async function () {
         jest.spyOn(Products, "bulkWrite").mockRejectedValue(err);
 
         const res = await request(app).post("/comercial/fornecedor/produto/editAll").send(productsData).expect(500);
-        expect(res.body).toEqual({err: "Erro interno no servidor"});
+        expect(res.body).toEqual({ err: "Erro interno no servidor" });
     })
 
-    test("Deletar produto. /comercial/fornecedor/produto/delete/:id", async function() {
+    test("Deletar produto. /comercial/fornecedor/produto/delete/:id", async function () {
         jest.spyOn(Products, "findByIdAndDelete").mockResolvedValue({});
-
         const res = await request(app).delete(`/comercial/fornecedor/produto/delete/${id.toString()}`).expect(200);
-        
+
         expect(Products.findByIdAndDelete).toHaveBeenCalledWith(id.toString());
         expect(res.text).toBe("sucesso");
     })
 
-    test("Capturar erro ao deletar produto", async function() {
-        const err = new Error();
+    test("Capturar erro ao deletar produto", async function () {
         jest.spyOn(Products, "findByIdAndDelete").mockRejectedValue(err);
 
         const res = await request(app).delete(`/comercial/fornecedor/produto/delete/${id.toString()}`).expect(500);
-        expect(res.body).toEqual({err: "Erro interno no servidor"});
+        expect(res.body).toEqual({ err: "Erro interno no servidor" });
     })
 
+    afterEach(() => {
+        jest.restoreAllMocks();
+    })
 })
 
 afterEach(() => {

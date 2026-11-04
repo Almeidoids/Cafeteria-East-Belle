@@ -174,7 +174,7 @@ app.post("/fornecedor/produto/editAll", connect, async (req, res) => {
     }
 })
 
-app.delete("/fornecedor/produto/delete/:id", connect, async (req, res) => {
+app.delete("/fornecedor/produto/delete/:id", connect, async (req, res, next) => {
     const { id } = req.params;
     try {
         await Products.findByIdAndDelete(id);
