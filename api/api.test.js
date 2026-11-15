@@ -37,6 +37,9 @@ import { Client, Supplier, Products } from "./models/models";
 // Testes
 import { mockQueryResult, mockBasicModelOperations, postUserReq } from "./test/api.testHelper";
 
+const id = 123456789123456789012345n;
+const image = path.resolve("public", "banner", "banner.jpg");
+
 const data = {
     name: "teste",
     email: "teste@teste.com",
@@ -45,14 +48,55 @@ const data = {
     password: "teste",
     active: true,
 }
-const id = 123456789123456789012345n;
 const modelDataTest = { _id: new mongoose.Types.ObjectId(id.toString()), ...data };
+const productsData = [{
+    _id: new mongoose.Types.ObjectId(id.toString()),
+    name: "teste",
+    description: "teste",
+    price: "12.34",
+    quantity: 50,
+    offer: 10,
+    buyed: 10,
+    supplier: modelDataTest,
+    expireAt: new Date("2026-11-01").toISOString(),
+},
+{
+    _id: new mongoose.Types.ObjectId((id + 1n).toString()),
+    name: "teste2",
+    description: "teste2",
+    price: "12.34",
+    quantity: 50,
+    offer: 10,
+    buyed: 10,
+    supplier: modelDataTest,
+    expireAt: new Date("2026-11-01").toISOString(),
+}]
 const err = new Error();
 
 beforeEach(() => {
+    const findMockedFunctions = {
+        exec: jest.fn().mockResolvedValue(productsData),
+        gt() {
+            return this;
+        },
+        where() {
+            return this;
+        },
+        limit() {
+            return this;
+        }
+    }
+
+    productsData.forEach(async function (value) {
+        value.images = [await fs.readFile(image)];
+    });
+
+    jest.spyOn(Products, "find").mockReturnValue(findMockedFunctions);
     connect.mockImplementation((req, res, next) => next());
 
     mockBasicModelOperations(Supplier, modelDataTest);
+    mockBasicModelOperations(Products, modelDataTest);
+    mockQueryResult(Products, "findById", Products(productsData[0]));
 })
 
 describe("Testes de account.js", function () {
@@ -70,6 +114,7 @@ describe("Testes de account.js", function () {
         getTkn.mockReturnValue(tkn);
 
         mockBasicModelOperations(Client, modelDataTest);
+
         jest.spyOn(bcrypt, "compare").mockResolvedValue(true);
 
         setTkn.mockImplementation((req, res) => {
@@ -240,31 +285,6 @@ describe("Testes de account.js", function () {
 });
 
 describe("Testes de comercial.js", function () {
-    const image = path.resolve("public", "banner", "banner.jpg");
-    const productsData = [{
-        _id: new mongoose.Types.ObjectId(id.toString()),
-        name: "teste",
-        description: "teste",
-        price: "12.34",
-        quantity: 50,
-        offer: 10,
-        buyed: 10,
-        supplier: modelDataTest,
-        images: image,
-        expireAt: new Date("2026-11-01"),
-    },
-    {
-        _id: new mongoose.Types.ObjectId((id + 1n).toString()),
-        name: "teste2",
-        description: "teste2",
-        price: "12.34",
-        quantity: 50,
-        offer: 10,
-        buyed: 10,
-        supplier: modelDataTest,
-        images: image,
-        expireAt: new Date("2026-11-01"),
-    }]
     const reqFormData = {
         name: productsData[0].name,
         description: productsData[0].description,
@@ -273,10 +293,9 @@ describe("Testes de comercial.js", function () {
         offer: productsData[0].offer,
         supplierName: modelDataTest.name
     };
-    const editReqFormData = {...reqFormData, buyed: productsData[0].buyed};
+    const editReqFormData = { ...reqFormData, buyed: productsData[0].buyed };
 
     beforeEach(() => {
-        mockQueryResult(Products, "find", productsData);
         mockBasicModelOperations(Products, productsData[0]);
     })
 
@@ -344,7 +363,6 @@ describe("Testes de comercial.js", function () {
     })
 
     test("Pegar dados do produto para auto-completar formulário de edição. GET /comercial/fornecedor/produto/edit/:id", async function () {
-        mockQueryResult(Products, "findById", productsData[0]);
         const result = {
             id: id.toString(),
             name: productsData[0].name,
@@ -352,7 +370,7 @@ describe("Testes de comercial.js", function () {
             price: productsData[0].price,
             quantity: productsData[0].quantity,
             offer: productsData[0].offer,
-            images: productsData[0].images
+            images: [JSON.parse(JSON.stringify(await fs.readFile(image)))],
         };
 
         const res = await request(app).get(`/comercial/fornecedor/produto/edit/${id.toString()}`).expect(200);
@@ -390,6 +408,8 @@ describe("Testes de comercial.js", function () {
     });
 
     test("Editar diversos produtos. /comercial/fornecedor/produto/editAll", async function () {
+        delete productsData[0].images;
+        delete productsData[1].images;
         jest.spyOn(Products, "bulkWrite").mockResolvedValue({});
         const res = await request(app).post("/comercial/fornecedor/produto/editAll").send(productsData).expect(200);
 
@@ -417,6 +437,90 @@ describe("Testes de comercial.js", function () {
 
         const res = await request(app).delete(`/comercial/fornecedor/produto/delete/${id.toString()}`).expect(500);
         expect(res.body).toEqual({ err: "Erro interno no servidor" });
+    })
+
+    afterEach(() => {
+        jest.restoreAllMocks();
+    })
+})
+
+describe("Testes de products.js", function () {
+    const cart = productsData.map(item => ({
+        amount: 5,
+        product: item.name,
+        price: item.price,
+        id: item._id.toString()
+    }))
+
+    test("Listar produtos. /products/", async function () {
+        const responseData = {
+            products: productsData.map(item => {
+                return {
+                    name: item.name,
+                    price: item.price,
+                    offer: item.offer,
+                    image: JSON.parse(JSON.stringify(item.images[0])),
+                    key: item._id.toString(),
+                    supplier: { ...item.supplier, _id: item.supplier._id.toString() }
+                }
+            })
+        };
+
+        const res = await request(app).get("/products/").expect(200);
+        expect(res.body).toEqual(responseData);
+    })
+
+    test("Capturar erro caso produtos não sejam encontrados", async function () {
+        jest.spyOn(Products, "find").mockReturnValue({
+            ...Products.find(),
+            exec: jest.fn().mockResolvedValue(null),
+        })
+
+        const res = await request(app).get("/products/").expect(404);
+        expect(res.body).toEqual({ err: "Erro ao listar produtos. Produtos não encontrados" });
+    })
+
+    test("Capturar produto por ID. /products/:id", async function () {
+        const res = await request(app).get(`/products/${id.toString()}`).expect(200);
+        expect(res.body).toEqual({
+            product: {
+                ...productsData[0],
+                _id: id.toString(),
+                images: JSON.parse(JSON.stringify(productsData[0].images)),
+                supplier: id.toString(),
+            }
+        });
+    })
+
+    test("Lançar erro caso produto não seja encontrado", async function () {
+        mockQueryResult(Products, "findById", null);
+        const res = await request(app).get(`/products/${id.toString()}`).expect(404);
+        expect(res.body).toEqual({ err: "Produto não encontrado" });
+    });
+
+    test("Realizar compra dos produtos. /products/buy", async function () {
+        const res = await request(app).post("/products/buy")
+            .send({ cart }).expect(200);
+
+        expect(Products.prototype.save).toHaveBeenCalled();
+        expect(res.text).toBe("Sucesso na compra");
+    })
+
+    test("Lançar erro caso produto não seja encontrado,", async function() {
+        mockQueryResult(Products, "findById", null);
+        const res = await request(app).post("/products/buy")
+            .send({ cart }).expect(404);
+        
+        expect(res.body).toEqual({err: "Produtos não encontrados"});
+    })
+
+    test("Capturar erro caso haja tentativa de comprar mais quantidade do que há no estoque do produto", async function() {
+        cart[0].amount = 60;
+
+        const res = await request(app).post("/products/buy")
+            .send({ cart }).expect(400);
+        
+        expect(res.body).toEqual({err: "Erro na compra"});
     })
 
     afterEach(() => {

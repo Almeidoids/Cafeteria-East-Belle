@@ -6,14 +6,19 @@ const connect = require("./util/connect");
 
 // Constants 
 const { Supplier, Products } = require("./models/models");
+const HTTPErrors = require("./util/HTTPErrors");
 
 app.use(express.json());
 
 app.get("/", connect,
 
-    async function (req, res) {
+    async function (req, res, next) {
         try {
             const listProducts = await Products.find().limit(20).where("quantity").gt(0).exec();
+
+            if (!listProducts) {
+                throw new HTTPErrors("Erro ao listar produtos. Produtos não encontrados", 404);
+            }
 
             const data = {
                 products: listProducts.map(item => {
@@ -23,7 +28,7 @@ app.get("/", connect,
                         offer: item.offer,
                         image: item.images[0],
                         key: item._id,
-                        supplierId: item.supplier
+                        supplier: item.supplier
                     }
                 })
             }
@@ -32,57 +37,55 @@ app.get("/", connect,
         }
 
         catch (err) {
-            console.log(err);
-            res.status(500).json({ err: "Erro ao listar produtos" });
+            next(err);
         }
     })
 
-app.get("/:id", connect, async (req, res) => {
+app.get("/:id", connect, async (req, res, next) => {
     const { id } = req.params;
 
     try {
         const product = await Products.findById(id).exec();
 
-        if (!product) res.status(404).json("Produto não encontrado")
+        if (!product) {
+            throw new HTTPErrors("Produto não encontrado", 404);
+        }
 
         res.json({ product: product });
     }
 
     catch (err) {
-        console.log(err);
-        res.status(500).json({ err: "Erro ao capturar produto" });
+        next(err);
     }
 })
 
-app.post("/buy", connect, (req, res) => {
-    console.log(req.body);
+app.post("/buy", connect, async (req, res, next) => {
     const { cart } = req.body;
-    console.log(req.body);
-    console.log(cart);
 
-    cart.forEach(async function (value) {
-        try {
+    try {
+        for (const value of cart) {
             const product = await Products.findById(value.id).exec();
 
-            if (!product) return res.status(404).json({ err: "Produto não encontrado" });
+            if (!product) {
+                throw new HTTPErrors("Produtos não encontrados", 404);
+            }
 
             product.buyed += value.amount;
             product.quantity -= value.amount;
 
             if (product.quantity < 0) {
-                return res.status(400).json({ err: "Erro na compra" });
+                throw new HTTPErrors("Erro na compra", 400);
             }
-
             else {
                 await product.save();
-                res.send("Sucesso na compra");
             }
         }
 
-        catch (err) {
-            res.status(500).json({err: "Erro na compra"});
-        }
-    })
+        res.send("Sucesso na compra");
+    }
+    catch (err) {
+        next(err);
+    }
 })
 
 module.exports = app;
